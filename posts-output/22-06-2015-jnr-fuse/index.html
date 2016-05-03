@@ -339,7 +339,7 @@ The performance will mostly depend on your FS implementation, so if you already 
 <p>In order to show performance difference, I moved MemoryFS implementation from fuse-jna to jnr-fuse with minimal changes and ran reading test. For the test, I used <a href="http://freecode.com/projects/fio">fio</a> framework.</p>
 </div>
 <details>
-  <summary><span style="color: #527bbd">Конфигурация теста</span></summary>
+  <summary><span style="color: #527bbd">Test configuration</span></summary>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-properties" data-lang="properties">[readtest]
@@ -354,10 +354,9 @@ size=16M
 runtime=60</code></pre>
 </div>
 </div>
-  <p>More info about the details.</p>
 </details>
 <details>
-  <summary><span style="color: #527bbd">Результат fuse-jna</span></summary>
+  <summary><span style="color: #527bbd">The result of of fuse-jna</span></summary>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-none" data-lang="none">serce@SerCe-FastLinux:~/git/jnr-fuse/bench$ fio read.ini
@@ -390,10 +389,9 @@ Run status group 0 (all jobs):
 READ: io=1580.2MB, aggrb=26967KB/s, minb=26967KB/s, maxb=26967KB/s, mint=60000msec, maxt=60000msec</code></pre>
 </div>
 </div>
-  <p>More info about the details.</p>
 </details>
 <details>
-  <summary><span style="color: #527bbd">Результат jnr-fuse</span></summary>
+  <summary><span style="color: #527bbd">The result of jnr-fuse</span></summary>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-properties" data-lang="properties">serce@SerCe-FastLinux:~/git/jnr-fuse/bench$ fio read.ini

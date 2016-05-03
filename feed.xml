@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Tue, 03 May 2016 21:42:55 +0300
+Tue, 03 May 2016 23:01:57 +0300
 </lastBuildDate>
 <generator>
 clj-rss
@@ -303,7 +303,7 @@ The performance will mostly depend on your FS implementation, so if you already 
 &lt;p&gt;In order to show performance difference, I moved MemoryFS implementation from fuse-jna to jnr-fuse with minimal changes and ran reading test. For the test, I used &lt;a href=&quot;http://freecode.com/projects/fio&quot;&gt;fio&lt;/a&gt; framework.&lt;/p&gt;
 &lt;/div&gt;
 &lt;details&gt;
-  &lt;summary&gt;&lt;span style=&quot;color: #527bbd&quot;&gt;Конфигурация теста&lt;/span&gt;&lt;/summary&gt;
+  &lt;summary&gt;&lt;span style=&quot;color: #527bbd&quot;&gt;Test configuration&lt;/span&gt;&lt;/summary&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;[readtest]
@@ -318,10 +318,9 @@ size=16M
 runtime=60&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-  &lt;p&gt;More info about the details.&lt;/p&gt;
 &lt;/details&gt;
 &lt;details&gt;
-  &lt;summary&gt;&lt;span style=&quot;color: #527bbd&quot;&gt;Результат fuse-jna&lt;/span&gt;&lt;/summary&gt;
+  &lt;summary&gt;&lt;span style=&quot;color: #527bbd&quot;&gt;The result of of fuse-jna&lt;/span&gt;&lt;/summary&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-none&quot; data-lang=&quot;none&quot;&gt;serce@SerCe-FastLinux:~/git/jnr-fuse/bench$ fio read.ini
@@ -354,10 +353,9 @@ Run status group 0 (all jobs):
 READ: io=1580.2MB, aggrb=26967KB/s, minb=26967KB/s, maxb=26967KB/s, mint=60000msec, maxt=60000msec&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-  &lt;p&gt;More info about the details.&lt;/p&gt;
 &lt;/details&gt;
 &lt;details&gt;
-  &lt;summary&gt;&lt;span style=&quot;color: #527bbd&quot;&gt;Результат jnr-fuse&lt;/span&gt;&lt;/summary&gt;
+  &lt;summary&gt;&lt;span style=&quot;color: #527bbd&quot;&gt;The result of jnr-fuse&lt;/span&gt;&lt;/summary&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;serce@SerCe-FastLinux:~/git/jnr-fuse/bench$ fio read.ini
