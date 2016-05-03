@@ -1,0 +1,97 @@
+{% extends "/html/base.html" %}
+{% block maincontent %}
+<div style="margin-top: -20px;" class="jumbotron">
+    <style>
+        #contact-info > dt {
+            width: 8ex;
+            text-align: justify;
+            margin-right: 2ex;
+            white-space: nowrap;
+        }
+
+        #contact-info > dd {
+            white-space: nowrap;
+            margin-left: initial;
+        }
+    </style>
+    <div class="container">
+        <div class="row">
+            <img class="col-md-2 img-responsive img-circle" src="img/me.jpg">
+            <div class="col-md-7">
+                <h1>Sergey Tselovalnikov</h1>
+                <p>
+                    <small>
+                        Passionate software developer<br>
+                        <a href="https://dl.dropboxusercontent.com/u/70038981/resume.pdf">Resume</a> •
+                        <a href="https://github.com/SerCeMan">Github</a>
+                    </small>
+                </p>
+            </div>
+            <div class="col-md-3" style="margin-top: 20px">
+                <h4>
+                    <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                    &nbsp; Contact Information
+                </h4>
+                <dl style="margin-top: 15px" class="dl-horizontal" id="contact-info">
+                    <dt>Email</dt>
+                    <dd><a href="mailto:sergeicelov@gmail.com">sergeicelov@gmail.com</a></dd>
+                    <dt>LinkedIn</dt>
+                    <dd><a href="https://linkedin.com/in/serce">serce</a></dd>
+                    <dt>Twitter</dt>
+                    <dd><a href="https://twitter.com/SerCeMan">@SerCeMan</a></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <style>
+
+    </style>
+    <div class="col-md-6">
+        <div class="line-highlighted">
+            <h3><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                &nbsp;About Me</h3>
+        </div>
+        <div class="about">
+            <p>Hi! My name is Sergey Tselovalnikov. I'm:</p>
+            <ul>
+                <li>Software engineer at <a href="https://www.jetbrains.com/">JetBrains</a></li>                <li>Leader of <a href="http://jugekb.ru">JUG.EKB</a></li>
+                <li>JVM platform fan</li>
+                <li>Functional programming enthusiast</li>
+                <li>Writing code in Java, Kotlin, Groovy, Clojure, and ClojureScript</li>
+                <li>Technology internals diver</li>
+                <!--<li>I'm trying to build software that helps the world to reach new level</li>-->
+                <li>Interested in all areas of IT, and also in powerlifting, boxing, and cycling
+                </li>
+            </ul>
+            <p>
+                I think that it is vital to understand the whole stack of technologies you use from up to down.
+            </p>
+            <p>
+                Here is my personal blog where I share my thoughts and experience with different technologies.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        {% if latest-posts|not-empty %}
+        <div id="recent">
+            <div class="line-highlighted">
+                <h3>Recent Posts</h3>
+            </div>
+            <ul>
+                {% for post in latest-posts %}
+                <li><a href="{{post.uri}}">{{post.title}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
