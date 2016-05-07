@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Sat, 07 May 2016 12:20:37 +0300
+Sat, 07 May 2016 13:09:15 +0300
 </lastBuildDate>
 <generator>
 clj-rss
@@ -46,19 +46,19 @@ I&amp;#8217;ll also show you how to connect Java and native code without writing
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;First of all, it is important to understand what FUSE is.
-FUSE - FileSystem in Userspace, it helps users without any priveledges to create his file system without a necessity to write code in a kernel space.&lt;/p&gt;
+FUSE - FileSystem in Userspace - helps users without any privileges to create their file system without a necessity to write code in a kernel space.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This is possible because filesystem code runs in userspace. And FUSE module is just a bridge between kernel API and your code. FUSE was officially included in Linux source tree in 2.6.14.&lt;/p&gt;
+&lt;p&gt;This is possible because the filesystem code runs in userspace. And the FUSE module is just a bridge between the kernel API and your code. FUSE was officially included in the Linux source tree in 2.6.14.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/jnr-fuse/bridge.png&quot; alt=&quot;bridge&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;So, you can easily create your own filesystem (&lt;a href=&quot;https://github.com/libfuse/libfuse/blob/master/example/hello.c&quot;&gt;here the simplest example&lt;/a&gt;). There are a lot of areas where you can use it. For example, you can quickly write FS where Github or DropBox would be backend.&lt;/p&gt;
+&lt;p&gt;So, you can easily create your own filesystem (&lt;a href=&quot;https://github.com/libfuse/libfuse/blob/master/example/hello.c&quot;&gt;here is the simplest example&lt;/a&gt;). There are a lot of areas where you can use it. For example, you can quickly write a FS where Github or DropBox would be the backend.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Or, let&amp;#8217;s imagine, you have a business application where all user files stored in a database. But your client wants to have access to them from a filesystem on the server. Of course to duplicate files in filesystem and database is a wrong decision. And here FUSE comes; you just little FUSE program which handles all user requests to the directory and redirects them to the database.&lt;/p&gt;
+&lt;p&gt;Or, let&amp;#8217;s imagine, you have a business application where all user files are stored in a database. But your client wants to have access to them from a filesystem on the server. Of course to duplicate files in the filesystem and the database is the wrong decision. And here FUSE comes in; you just need a little FUSE program which handles all user requests to the directory and redirects them to the database.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -66,45 +66,45 @@ FUSE - FileSystem in Userspace, it helps users without any priveledges to create
 &lt;h2 id=&quot;_java_and_native_code&quot;&gt;Java and native code&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;So far so good. But implementation of FUSE starting from &quot;include header &amp;lt;fuse.h&amp;gt;&quot;. But you business application is written in Java. Obviously, it is necessary to communicate with native code.&lt;/p&gt;
+&lt;p&gt;So far so good. But implementation of FUSE starts from &quot;include header &amp;lt;fuse.h&amp;gt;&quot;. But your business application is written in Java. Obviously, it is necessary to communicate with the native code.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_jni&quot;&gt;JNI&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The standard tool for a native communication in Java is JNI. But it brings a lot of complexity. Especially because for using FUSE we need a lot of callbacks from native code to Java. And &quot;write once&quot; is suffering in this case (However, in FUSE case it is not so important).
-If you try to find projects that implement FUSE wrapper using JNI you will find a few projects, but they have already been obsolete for a long time. And their API is very inconvenient.&lt;/p&gt;
+&lt;p&gt;The standard tool for a native communication in Java is JNI. But it brings a lot of complexity. Especially because for using FUSE we need a lot of callbacks from the native code to Java. And &quot;write once&quot; is suffering in this case (However, in the case of FUSE it is not so important).
+If you try to find projects that implement a FUSE wrapper using JNI you will find a few projects, but they have been obsolete for a long time. And their API is very inconvenient.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_jna&quot;&gt;JNA&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Another option is &lt;a href=&quot;https://github.com/java-native-access/jna&quot;&gt;JNA library&lt;/a&gt;.  JNA (Java Native Access) gives you a possibility to easily get access to a native code without using JNI only by using Java code. It is very easy; you need just to declare interface which matches native code and get an implementation through &quot;Native.loadLibrary&quot;. And it&amp;#8217;s all.
+&lt;p&gt;Another option is &lt;a href=&quot;https://github.com/java-native-access/jna&quot;&gt;JNA library&lt;/a&gt;.  JNA (Java Native Access) gives you the possibility to get access to the native code easily without using JNI only by using Java code. It is very easy; you just need to declare an interface which matches the native code and get an implementation through &quot;Native.loadLibrary&quot;. And that&amp;#8217;s all.
 Another advantage of JNA is very detailed documentation. The project is alive, and it is in active development.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Moreover, a good project implementing FUSE using JNA already exists.
-But JNA has a lot of problems with performance. JNA is reflection based, so jump from native code to Java code with data conversion is very expensive. It is not so important in a case of seldom native calls. But FS has a lot of native calls. The only way to speed up fuse-jna is to read files using big chunks, but it doesn&amp;#8217;t always work. For example, when you have no access to clients code or when all files are small.
+But JNA has a lot of problems with performance. JNA is reflection based, so jumping from native code to Java code with data conversion is very expensive. It is not so important if native calls are rare. But a FS has a lot of native calls. The only way to speed up fuse-jna is to read files using big chunks, but it doesn&amp;#8217;t always work. For example, when you have no access to a client&amp;#8217;s code or when all files are small.
 Obviously, we need a library that combines JNI performance and JNA convenience.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_jnr&quot;&gt;JNR&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;And here JNR (Java Native Runtime) comes. JNR, as JNA is based on libffi library, but it used bytecode generation instead of reflection. And in the result, JNR achieves excellent performance results.
-The information about JNR is very limited. The most detailed piece of information is &lt;a href=&quot;http://medianetwork.oracle.com/video/player/2630340184001&quot;&gt;Charles Nutter talk on JVMLS 2013&lt;/a&gt;. But despite the fact of lack of information, JNR is already big ecosystem actively used by JRuby. A lot of jnr-based libraries such as unix-sockets and posix-api actively used by different projects.&lt;/p&gt;
+&lt;p&gt;And here is where JNR (Java Native Runtime) comes in. JNR, like JNA, is based on libffi library, but it uses a bytecode generation instead of reflection. And as a result, JNR achieves excellent performance.
+The information about JNR is very limited. The most detailed piece of information is &lt;a href=&quot;http://medianetwork.oracle.com/video/player/2630340184001&quot;&gt;Charles Nutter&amp;#8217;s talk on JVMLS 2013&lt;/a&gt;. But despite the lack of information, JNR is already a big ecosystem actively used by JRuby. A lot of jnr-based libraries such as unix-sockets and posix-api are actively used by different projects.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/jnr-fuse/jnr.png&quot; alt=&quot;jnr&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;JNR is a library which became a basis for the development of &lt;a href=&quot;http://openjdk.java.net/jeps/191&quot;&gt;JEP 191 - Foreign Function Interface&lt;/a&gt;, which targets for Java 10.
-In comparison to JNA, JNR has no proper documentation, and you need to look for answers in the source code. That is the main reason for that mini-guide.&lt;/p&gt;
+&lt;p&gt;JNR is a library which became a basis for the development of &lt;a href=&quot;http://openjdk.java.net/jeps/191&quot;&gt;JEP 191 - Foreign Function Interface&lt;/a&gt;, which is targeted for Java 10.
+In comparison to JNA, JNR has no proper documentation, and you need to look for answers in the source code. That is the main reason for this mini-guide.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;_specialities_of_writing_code_using_java_native_runtime&quot;&gt;Specialities of writing code using Java Native Runtime&lt;/h2&gt;
+&lt;h2 id=&quot;_specialties_of_writing_code_using_java_native_runtime&quot;&gt;Specialties of writing code using Java Native Runtime&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_function_binding&quot;&gt;Function binding&lt;/h3&gt;
@@ -132,10 +132,10 @@ public class Getpid {
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Here we are loading java library which matches native interface by name.&lt;/p&gt;
+&lt;p&gt;Here we are the loading java library which matches the native interface by name.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In a case of FUSE, we need an interface with method fuse_main_real where FuseOperations structure with all callbacks passes as an argument.&lt;/p&gt;
+&lt;p&gt;In the case of FUSE, we need an interface with method fuse_main_real where FuseOperations structure with all callbacks passes as an argument.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -153,10 +153,10 @@ public class Getpid {
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;struct fuse_bufvec {
-	size_t count;
-	size_t idx;
-	size_t off;
-	struct fuse_buf buf[1];
+    size_t count;
+    size_t idx;
+    size_t off;
+    struct fuse_buf buf[1];
 };&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -196,9 +196,9 @@ You need to inherit your enum from jnr.ffi.util.EnumMapper.IntegerEnum and imple
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;enum fuse_buf_flags {
-	FUSE_BUF_IS_FD	= (1 &amp;lt;&amp;lt; 1),
-	FUSE_BUF_FD_SEEK	= (1 &amp;lt;&amp;lt; 2),
-	FUSE_BUF_FD_RETRY	= (1 &amp;lt;&amp;lt; 3),
+    FUSE_BUF_IS_FD    = (1 &amp;lt;&amp;lt; 1),
+    FUSE_BUF_FD_SEEK    = (1 &amp;lt;&amp;lt; 2),
+    FUSE_BUF_FD_RETRY    = (1 &amp;lt;&amp;lt; 3),
 };&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -248,12 +248,12 @@ You need to inherit your enum from jnr.ffi.util.EnumMapper.IntegerEnum and imple
 &lt;h2 id=&quot;_jnr_fuse&quot;&gt;JNR-FUSE&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;What I&amp;#8217;ve implemented is FUSE wrapper in my project jnr-fuse. Previously I used fuse-jna, but it was a bottleneck in FS implementation. During the development, I tried to save compatibility with the native interface (&amp;lt;fuse.h&amp;gt;).&lt;/p&gt;
+&lt;p&gt;What I&amp;#8217;ve implemented is a FUSE wrapper in my project jnr-fuse. Previously I used fuse-jna, but it was a bottleneck in the FS implementation. During the development, I tried to save compatibility with the native interface (&amp;lt;fuse.h&amp;gt;).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;For implementing your own file system, you need to inherit ru.serce.jnrfuse.FuseStubFS and implement several methods.
-Fuse_operations contain &lt;a href=&quot;http://fuse.sourcearchive.com/documentation/2.8.4-1.4ubuntu1/structfuse__operations.html&quot;&gt;a lot of methods&lt;/a&gt;, but for working FS you need to implement just several methods.
-It is very easy, &lt;a href=&quot;https://github.com/SerCeMan/jnr-fuse/tree/master/src/main/java/ru/serce/jnrfuse/examples&quot;&gt;here some examples&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;For implementing your own file system, you need to extend ru.serce.jnrfuse.FuseStubFS and implement several methods.
+Fuse_operations contain &lt;a href=&quot;http://fuse.sourcearchive.com/documentation/2.8.4-1.4ubuntu1/structfuse__operations.html&quot;&gt;a lot of methods&lt;/a&gt;, but for getting your FS up and running, you just need to implement several methods.
+It is very easy, &lt;a href=&quot;https://github.com/SerCeMan/jnr-fuse/tree/master/src/main/java/ru/serce/jnrfuse/examples&quot;&gt;here are some examples&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Currently, only Linux is supported (x86 and x64).&lt;/p&gt;
@@ -296,11 +296,11 @@ dependencies {
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_jnr_fuse_and_fuse_jna_performance_comparison&quot;&gt;JNR-FUSE and FUSE-JNA performance comparison&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In my case FS was read-only, and I was interested in throughput.
-The performance will mostly depend on your FS implementation, so if you already use fuse-jna, you&amp;#8217;ll be able to change it easily to jnr-fuse, write a test, and to see the performance difference on your workload. (It will be helpful anyway because we all love to achieve new level of performance, right?)&lt;/p&gt;
+&lt;p&gt;In my case the FS was read-only, and I was interested in throughput.
+The performance will mostly depend on your FS implementation, so if you already use fuse-jna, you&amp;#8217;ll be able to change it easily to jnr-fuse, write a test, and to see the performance difference on your workload. (It will be helpful anyway because we all love to achieve new levels of performance, right?)&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In order to show performance difference, I moved MemoryFS implementation from fuse-jna to jnr-fuse with minimal changes and ran reading test. For the test, I used &lt;a href=&quot;http://freecode.com/projects/fio&quot;&gt;fio&lt;/a&gt; framework.&lt;/p&gt;
+&lt;p&gt;In order to show performance the difference, I moved MemoryFS implementation from fuse-jna to jnr-fuse with minimal changes and ran a reading test. For the test, I used &lt;a href=&quot;http://freecode.com/projects/fio&quot;&gt;fio&lt;/a&gt; framework.&lt;/p&gt;
 &lt;/div&gt;
 &lt;details&gt;
   &lt;summary&gt;&lt;span style=&quot;color: #527bbd&quot;&gt;Test configuration&lt;/span&gt;&lt;/summary&gt;
@@ -388,17 +388,16 @@ Run status group 0 (all jobs):
 READ: io=13826MB, aggrb=235955KB/s, minb=235955KB/s, maxb=235955KB/s, mint=60002msec, maxt=60002msec&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-  &lt;p&gt;More info about the details.&lt;/p&gt;
 &lt;/details&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/jnr-fuse/table.png&quot; alt=&quot;table&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The only information test shows us is the difference in reading a file using fuse-jna and jnr-fuse, but it gives us an understanding of the level of performance difference of JNA and JNR.
-If you are interested in you can write a more detailed test for native calls using the &lt;a href=&quot;http://openjdk.java.net/projects/code-tools/jmh/&quot;&gt;JMH&lt;/a&gt; tool.&lt;/p&gt;
+&lt;p&gt;The only information this test shows us is the difference in reading a file using fuse-jna and jnr-fuse, but it gives us an understanding of the level of performance difference of JNA and JNR.
+If you are interested, you can write a more detailed test for native calls using the &lt;a href=&quot;http://openjdk.java.net/projects/code-tools/jmh/&quot;&gt;JMH&lt;/a&gt; tool.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The performance differences in throughput and latency are about ~10 times. Charles Nutter in his presentation the same numbers.&lt;/p&gt;
+&lt;p&gt;The performance differences in throughput and latency are about ~10 times. Charles Nutter in his presentation gave us the same numbers.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
@@ -423,8 +422,8 @@ If you are interested in you can write a more detailed test for native calls usi
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The jnr-fuse project is located on GitHub. I&amp;#8217;ll appreciate stars, pull-requests, and comments.
-I&amp;#8217;ll be glad to answer to any questions you have about JNR or jnr-fuse.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://github.com/SerCeMan/jnr-fuse&quot;&gt;jnr-fus&lt;/a&gt;e project is located on GitHub. I&amp;#8217;ll appreciate stars, pull-requests, and comments.
+I&amp;#8217;ll be glad to answer any questions you have about JNR or jnr-fuse.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
