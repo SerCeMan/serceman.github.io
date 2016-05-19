@@ -4,9 +4,9 @@
  :site-url           "http://serce.me/"
  :post-root          "posts"
  :archives-uri       "posts"
- :post-root-uri      "posts-output"
- :tag-root-uri       "tags-output"
- :author-root-uri    "authors-output"
+ :post-root-uri      "posts"
+ :tag-root-uri       "tags"
+ :author-root-uri    "authors"
  :rss-name           "feed.xml"
  :rss-filters        ["cryogen"]
  :recent-posts       6
