@@ -3,7 +3,7 @@
                  [ring/ring-devel "1.4.0"]
                  [compojure "1.5.0"]
                  [ring-server "0.4.0"]
-                 [org.asciidoctor/asciidoctorj "1.5.2"]
+                 [org.asciidoctor/asciidoctorj "1.5.4"]
                  [cryogen-core "0.1.40"]]
   :plugins [[lein-ring "0.9.7"]]
   :main cryogen.core
