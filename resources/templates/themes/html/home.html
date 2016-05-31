@@ -85,7 +85,10 @@
             </div>
             <ul>
                 {% for post in latest-posts %}
-                <li><a href="{{post.uri}}">{{post.title}}</a></li>
+                <li>
+                    <h4>{{post.date|date:"MMM dd YYYY"}} </h4>
+                    <a href="{{post.uri}}">{{post.title}}</a>
+                </li>
                 {% endfor %}
             </ul>
         </div>
