@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 lein run
+cp -r resources/public/posts/ resources/public/post-output
 cp -r resources/public/ /tmp/
 git co master
 rm -rf *
