@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>
+<channel>
+<atom:link href='http://serce.me/' rel='self' type='application/rss+xml'/>
+<title>
+SerCe's blog
+</title>
+<link>
+http://serce.me/
+</link>
+<description>
+Personal blog
+</description>
+<lastBuildDate>
+Sat, 12 Nov 2016 23:05:12 +1100
+</lastBuildDate>
+<generator>
+clj-rss
+</generator>
+</channel>
+</rss>
