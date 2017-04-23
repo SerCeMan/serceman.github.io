@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -e
+set -o pipefail
+
 lein run
 cp -r resources/public/posts resources/public/posts-output
 cp -r resources/public /tmp/
