@@ -10,37 +10,14 @@
             [ring.middleware.reload :refer [wrap-reload]]
             [cryogen-core.io :refer [path]]))
 
-(defn twice []
-  (compile-assets-timed)
-  (compile-assets-timed))
-
 (defn init []
   (load-all-plugins)
   (compile-assets-timed)
   (let [ignored-files (-> (read-config) :ignored-files)]
-    (start-watcher! "resources/templates" ignored-files twice)))
-
-(defn wrap-subdirectories
-  [handler]
-  (fn [request]
-    (let [req-uri (.substring (url-decode (:uri request)) 1)
-          res-path (path req-uri (when (:clean-urls? (read-config)) "index.html"))]
-      (or (resource-response res-path {:root "public"})
-          (handler request)))))
-
-(defroutes routes
-           (GET "/" [] (redirect (let [config (read-config)]
-                                   (path (:blog-prefix config) "/"
-                                         (when-not (:clean-urls? config) "index.html")))))
-           (route/resources "/")
-           (route/not-found "Page not found"))
-
-(def handler (-> routes
-                 (wrap-subdirectories)))
+    (start-watcher! "resources/templates" ignored-files compile-assets-timed)))
 
 (comment
-  (ring/serve handler {:port          3000
-                       :auto-refresh? true
-                       :reload-paths  ["src" "resources"]
-                       :init          init})
+
+  (init)
+
   )
