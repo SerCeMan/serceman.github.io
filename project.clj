@@ -4,7 +4,7 @@
                  [compojure "1.5.0"]
                  [org.jetbrains.kotlin/kotlin-stdlib-jre8 "1.1.1"]
                  [ring-server "0.4.0"]
-                 [org.asciidoctor/asciidoctorj "1.5.4"]
+                 [org.asciidoctor/asciidoctorj "1.5.5"]
                  [cryogen-core "0.1.40"]]
   :plugins [[lein-ring "0.9.7"]
             [lein-exec "0.3.6"]]

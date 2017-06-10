@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="474px"
+   height="261px"
+   version="1.1"
+   content="&lt;mxfile userAgent=&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36&quot; version=&quot;6.5.7&quot; editor=&quot;www.draw.io&quot; type=&quot;device&quot;&gt;&lt;diagram name=&quot;Page-1&quot;&gt;5Zrfd5sgFMf/mjwuB0VNfGyzbnvYzuk52TlbH1lC1E3FITZmf/0wQAzRtFmKP7r2oSEXuMLnwperZgIXSfmRoiz8QtY4nthgXU7g+4lt+47P/1eGnTC4LhCGgEZrYbJqwzL6g6VRNSuiNc61hoyQmEWZblyRNMUrptkQpWSrN9uQWL9qhgLcMCxXKG5av0VrFgrr3PZq+yccBaG6suXJCf9Aq18BJUUqrzex4Wb/J6oTpHzJieYhWpPtkQneTeCCEsJEKSkXOK7QKmyi34cztYdxU5yySzrICeVsp6a+HzyuqsEE3oYsiXnR4kVcRuy7NFflB2VPGd3tK6au+vog2/3EjO1keFHBCDcRykISkBTFnwnJpA8xCrxuRKWehzTlpKAr2cqWKwPRAMtWzoEhX5qYJJgPhjehOEYsetS9I7lIgkO7GhQvSFbt3GYNbtXgl/JrSlL+cfssSusEZQ+4XsBGdr0nEb+IDcqTrS23uuUD3YUIj+x1QvgwjIugy3g/orjAant5MZ/w7Ybsh1SHw/tdEFXxLt8TveENLC8r60peCqrPrxSlOVqxiKTKIR+K8ClaNKMdx1yLqiBvw4jhZYb2lLdcDfVQV15kRC3v4OkRU4bLp4PXjJTsAP0T4kpMtrVUWUDawiOZcsH54F668K2mYlyz8sHU9o4WP5j6jiEpqVzeYxrxmWEq+163X5ymvFhuT/pimREYMJ3ZHch1p4z9nhA7HanJPdoleC8dZpXEgHLY8zNa3Ydy+C/n7bTxvkn4LhglbujouG2vidvrSqdBc+oGMpSDeljH2tFF7mI8UYHA1aIBAdRdCF1qJCr/7shcxmM5Zo4B7ah1X0O0bKhDtufuddF61pHBaLkdSdyioJz3ajdGkTso2BAiNzeUJY0gGdXu1EAzLVJ3Pya33sWcfUOch85Gn4Xcgb5dClmNx3hCuqEkEfWcUt7BPa4BFXFUOv6EinSWmarhGtftFCV4lLTnOm0I+9NspWMtsPMMpdfD5heoUQtXY0ANBkQN/9Pj0W1R7tmAym0oSx/X8dgG2RsQsoHkuvV4rMiN+3B059aAh6P3xg5Hz9Fp96rYszd1OLregKib9zRjevV5LMXw/LN0TZ1BO+wXPolxZmfUx/wDFNjNQ8s+QmEcuwf7w27g/ufMqxDK8tfwStUFOuwuX4zwr/XvO0S06t/QwLu/&lt;/diagram&gt;&lt;/mxfile&gt;"
+   id="svg3479"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="domain_clj.svg">
+  <metadata
+     id="metadata3601">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1422"
+     inkscape:window-height="1031"
+     id="namedview3599"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="-9.2761124"
+     inkscape:cy="5.7162364"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g3483"
+     showguides="true" />
+  <defs
+     id="defs3481">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 130.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="474 : 130.5 : 1"
+       inkscape:persp3d-origin="237 : 87 : 1"
+       id="perspective4345" />
+  </defs>
+  <g
+     transform="translate(0.5,0.5)"
+     id="g3483">
+    <path
+       d="M 177 43 L 107.99 67.84"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3485" />
+    <path
+       d="M 103.05 69.62 L 108.45 63.96 L 107.99 67.84 L 110.82 70.54 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3487" />
+    <path
+       d="M 247 43 L 316.01 67.84"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3489"
+       stroke="#ACACAC"
+       fill="none"
+       style="stroke-width:4.5;stroke-miterlimit:10;stroke-dasharray:none;fill:#ff0000;stroke:#ef0c0c;stroke-opacity:1" />
+    <path
+       d="M 320.95 69.62 L 313.18 70.54 L 316.01 67.84 L 315.55 63.96 Z"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3491"
+       style="stroke:#f01919;stroke-opacity:1;fill:#f41111;fill-opacity:1;stroke-width:4.5;stroke-miterlimit:10;stroke-dasharray:none"
+       stroke="#ACACAC"
+       fill="#ACACAC" />
+    <ellipse
+       cx="212"
+       cy="25"
+       rx="50"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3493" />
+    <g
+       transform="translate(170.12967,13.666465)"
+       id="g3495">
+      <text
+         x="42"
+         y="17"
+         font-size="16px"
+         id="text3497"
+         style="font-size:16px;font-family:Helvetica;text-anchor:middle;fill:#000000">Transaction</text>
+    </g>
+    <path
+       d="M 78 117 L 65.64 134.77"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3499" />
+    <path
+       d="M 62.64 139.08 L 63.76 131.34 L 65.64 134.77 L 69.51 135.33 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3501" />
+    <path
+       d="M 124 120 L 137.74 135.27"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3503" />
+    <path
+       d="M 141.25 139.17 L 133.97 136.31 L 137.74 135.27 L 139.17 131.62 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3505" />
+    <ellipse
+       cx="102"
+       cy="95"
+       rx="50"
+       ry="25"
+       pointer-events="none"
+       id="ellipse3507"
+       stroke="#ACACAC"
+       fill="#ffffff" />
+    <g
+       transform="translate(76.741254,86.5)"
+       id="g3509">
+      <text
+         x="24"
+         y="13"
+         font-size="16px"
+         id="text3511"
+         style="font-size:16px;font-family:Helvetica;text-anchor:middle;fill:#000000">Payment</text>
+    </g>
+    <ellipse
+       cx="142"
+       cy="165"
+       rx="30"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3513" />
+    <g
+       transform="translate(117.5,157.5)"
+       id="g3515">
+      <text
+         x="24"
+         y="13"
+         fill="#000000"
+         text-anchor="middle"
+         font-size="16px"
+         font-family="Helvetica"
+         id="text3517">Amount</text>
+    </g>
+    <path
+       d="M 77 183 L 77 183"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3519" />
+    <path
+       d="M 77 183 L 77 183 L 77 183 L 77 183 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3521" />
+    <path
+       d="M 7 165 L 7 165"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3523" />
+    <path
+       d="M 7 165 L 7 165 L 7 165 L 7 165 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3525" />
+    <ellipse
+       cx="62"
+       cy="165"
+       rx="30"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3527" />
+    <g
+       transform="translate(33.5,157.5)"
+       id="g3529">
+      <text
+         x="27.463209"
+         y="13.314837"
+         font-size="14px"
+         id="text3531"
+         style="font-size:14px;font-family:Helvetica;text-anchor:middle;fill:#000000">Currency</text>
+    </g>
+    <path
+       d="M 222 187 L 209.64 204.77"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3533" />
+    <path
+       d="M 206.64 209.08 L 207.76 201.34 L 209.64 204.77 L 213.51 205.33 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3535" />
+    <path
+       d="M 268 190 L 281.74 205.27"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3537"
+       style="stroke-width:4.5;stroke-miterlimit:10;stroke-dasharray:none;stroke:#ee1b1b;stroke-opacity:1;fill:#ed1212;fill-opacity:1" />
+    <path
+       d="M 285.25 209.17 L 277.97 206.31 L 281.74 205.27 L 283.17 201.62 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3539"
+       style="fill:#f01e1e;fill-opacity:1;stroke:#e31c1c;stroke-opacity:1" />
+    <ellipse
+       cx="246"
+       cy="165"
+       rx="50"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3541" />
+    <g
+       transform="translate(199.5,156.5)"
+       id="g3543">
+      <text
+         x="46"
+         y="15"
+         fill="#000000"
+         text-anchor="middle"
+         font-size="16px"
+         font-family="Helvetica"
+         id="text3545">from: Person</text>
+    </g>
+    <ellipse
+       cx="286"
+       cy="235"
+       rx="30"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3547" />
+    <g
+       transform="translate(267.5,227.5)"
+       id="g3549">
+      <text
+         x="18"
+         y="13"
+         fill="#000000"
+         text-anchor="middle"
+         font-size="16px"
+         font-family="Helvetica"
+         id="text3551">name</text>
+    </g>
+    <ellipse
+       cx="206"
+       cy="235"
+       rx="30"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3553" />
+    <g
+       transform="translate(200.5,227.5)"
+       id="g3555">
+      <text
+         x="5"
+         y="13"
+         fill="#000000"
+         text-anchor="middle"
+         font-size="16px"
+         font-family="Helvetica"
+         id="text3557">id</text>
+    </g>
+    <path
+       d="M 379 187 L 366.64 204.77"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3559" />
+    <path
+       d="M 363.64 209.08 L 364.76 201.34 L 366.64 204.77 L 370.51 205.33 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3561" />
+    <path
+       d="M 425 190 L 438.74 205.27"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3563" />
+    <path
+       d="M 442.25 209.17 L 434.97 206.31 L 438.74 205.27 L 440.17 201.62 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3565" />
+    <ellipse
+       cx="403"
+       cy="165"
+       rx="50"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3567" />
+    <g
+       transform="translate(366.5,156.5)"
+       id="g3569">
+      <text
+         x="36"
+         y="15"
+         fill="#000000"
+         text-anchor="middle"
+         font-size="16px"
+         font-family="Helvetica"
+         id="text3571">to: Person</text>
+    </g>
+    <ellipse
+       cx="443"
+       cy="235"
+       rx="30"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3573" />
+    <g
+       transform="translate(424.5,227.5)"
+       id="g3575">
+      <text
+         x="18"
+         y="13"
+         fill="#000000"
+         text-anchor="middle"
+         font-size="16px"
+         font-family="Helvetica"
+         id="text3577">name</text>
+    </g>
+    <ellipse
+       cx="363"
+       cy="235"
+       rx="30"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3579" />
+    <g
+       transform="translate(357.5,227.5)"
+       id="g3581">
+      <text
+         x="5"
+         y="13"
+         fill="#000000"
+         text-anchor="middle"
+         font-size="16px"
+         font-family="Helvetica"
+         id="text3583">id</text>
+    </g>
+    <path
+       d="M 288 113 L 251.36 136.56"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3585"
+       style="fill:#ee1616;fill-opacity:1;stroke:#ed0d0d;stroke-opacity:1;stroke-width:4.5;stroke-miterlimit:10;stroke-dasharray:none" />
+    <path
+       d="M 246.94 139.4 L 250.94 132.67 L 251.36 136.56 L 254.72 138.55 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3587"
+       style="fill:#ee1616;fill-opacity:1;stroke:#ed0d0d;stroke-opacity:1;stroke-width:4.5;stroke-miterlimit:10;stroke-dasharray:none" />
+    <path
+       d="M 358 113 L 397.54 136.72"
+       fill="none"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3589" />
+    <path
+       d="M 402.04 139.42 L 394.24 138.82 L 397.54 136.72 L 397.84 132.82 Z"
+       fill="#ACACAC"
+       stroke="#ACACAC"
+       stroke-miterlimit="10"
+       pointer-events="none"
+       id="path3591" />
+    <ellipse
+       cx="323"
+       cy="95"
+       rx="50"
+       ry="25"
+       fill="#ffffff"
+       stroke="#ACACAC"
+       pointer-events="none"
+       id="ellipse3593" />
+    <g
+       transform="translate(304.44451,82.721954)"
+       id="g3595">
+      <text
+         x="19"
+         y="17"
+         font-size="16px"
+         id="text3597"
+         style="font-size:16px;font-family:Helvetica;text-anchor:middle;fill:#000000">Parts</text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="268.90768"
+       y="44.832436"
+       id="text4341"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4343"
+         x="268.90768"
+         y="44.832436">:parts</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="211.82442"
+       y="123.02839"
+       id="text4368"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4370"
+         x="211.82442"
+         y="123.02839">:from</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="278.85742"
+       y="199.27461"
+       id="text4372"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4374"
+         x="278.85742"
+         y="199.27461">:name</tspan></text>
+  </g>
+</svg>
