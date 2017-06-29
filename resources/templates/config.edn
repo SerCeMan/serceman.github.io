@@ -13,7 +13,7 @@
  :post-date-format   "dd-MM-yyyy"
  :sass-src           nil
  :sass-dest          nil
- :resources          ["img"]
+ :resources          ["img" "root/keybase.txt"]
  :keep-files         [".git"]
  :disqus?            true
  :disqus-shortname   "serceman"
