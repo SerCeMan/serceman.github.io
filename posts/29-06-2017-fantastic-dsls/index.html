@@ -181,11 +181,13 @@ it, the easiest way to do that is</p>
 </div>
 <div class="paragraph">
 <p>Moreover, the parentheses can be omitted completely if a lambda is the only parameter of a function. E.g. <code>do5times</code> function
-that takes a lambda as a parameter can be called as</p>
+that only takes a lambda as a parameter can be defined and called as</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">do5times {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">fun do5times(f: () -&gt; Unit) = dotimes(5, f)
+
+do5times {
     println("Hello, Kotlin!")
 }</code></pre>
 </div>

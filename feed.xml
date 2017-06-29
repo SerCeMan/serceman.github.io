@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Thu, 29 Jun 2017 20:03:10 +1000
+Thu, 29 Jun 2017 21:48:40 +1000
 </lastBuildDate>
 <generator>
 clj-rss
@@ -146,11 +146,13 @@ it, the easiest way to do that is&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Moreover, the parentheses can be omitted completely if a lambda is the only parameter of a function. E.g. &lt;code&gt;do5times&lt;/code&gt; function
-that takes a lambda as a parameter can be called as&lt;/p&gt;
+that only takes a lambda as a parameter can be defined and called as&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-kotlin&quot; data-lang=&quot;kotlin&quot;&gt;do5times {
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-kotlin&quot; data-lang=&quot;kotlin&quot;&gt;fun do5times(f: () -&amp;gt; Unit) = dotimes(5, f)
+
+do5times {
     println(&quot;Hello, Kotlin!&quot;)
 }&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
