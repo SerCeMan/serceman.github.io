@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>SerCe&#39;s blog: Fantastic DSLs and where to find them</title>
+    <link rel="canonical" href="http://serce.me/posts/29-06-2017-fantastic-dsls/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/styles/default.min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Serif:400,400italic,700,700italic%7CRoboto%7CAlegreya:400italic,700italic,400,700">
+    <link href="/css/screen.css" rel="stylesheet" type="text/css" />
+    <link href="/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="/css/idea.css" rel="stylesheet" type="text/css" />
+    <link href="/css/custom.css" rel="stylesheet" type="text/css" />
+    
+    <link href="/css/asciidoctor-default.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+
+
+<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SerCe&#39;s blog</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li ><a href="/">Home</a></li>
+                <li
+                        ><a href="/archives/">Blog</a></li>
+                
+                <!--<li><a href="/feed.xml">RSS</a></li>-->
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div><!--/.container-fluid -->
+</nav>
+
+
+
+<div class="container">
+
+    
+<div class="row">
+    <div class="col-lg-12">
+        <div id="content">
+
+            <div id="post">
+                <div class="post-header">
+    <div id="post-meta" class="row">
+        <div class="col-lg-6">29 June 2017</div>
+        
+    </div>
+    <h2>Fantastic DSLs and where to find them</h2>
+</div>
+<div>
+    
+    <div class="paragraph">
+<p>Hi!</p>
+</div>
+<div class="paragraph">
+<p>Kotlin is a very rich language. Unlike many other languages, it allows developers to create another language inside it. For example,
+to mimic HTML syntax or to build a completely typed SQL query. But Kotlin’s power isn&#8217;t limited to simple DSLs. With some Kotlin-fu,
+it’s possible to write a DSL that allows manipulating untyped data structures in a typed manner.
+In this article, we’ll go through different ways to define DSL in Kotlin, from very simple to fantastically powerful.</p>
+</div>
+<div class="paragraph">
+<p><br></p>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/kotlin_island.png" alt="kotlin island"></span></p>
+</div>
+<div class="paragraph text-center">
+<p><br></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Peter the Great at one time even considered moving the capital of Russia to Kotlin Island, proof of the sovereign’s great
+affinity with water. This utopian idea failed, but many of the fantasies of this baroque autocrat still managed to become implemented.</p>
+</div>
+</blockquote>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+Some parts of this article might be hard to understand without knowledge of Kotlin syntax. I tried to explain
+every feature I showed, but the general ability to speak Kotlin is strongly suggested.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>So, let&#8217;s begin the journey.</p>
+</div>
+<div class="sect1">
+<h2 id="_what_is_dsl">What is DSL</h2>
+<div class="sectionbody">
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Domain-specific language (noun): a computer programming language of limited expressiveness focused on a particular domain</p>
+</div>
+</blockquote>
+<div class="attribution">
+&#8212; Martin Fowler<br>
+<cite>Domain-Specific Languages</cite>
+</div>
+</div>
+<div class="paragraph">
+<p>Here though, I prefer to give DSLs a slightly different definition which reflects what is written in the article</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>a language (or a set of abstractions) that&#8217;s built to deal with a specific domain</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>The main difference is that a DSL might not only be a separate language but also a subset of a language which is used
+to work on a specific domain. This kind of DSL can even be built in Java with some fluent API, but very often it’s
+indistinguishable from a plain good code. To contrast in Kotlin, many remarkable features might make an internal
+DSL look different.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_calling_convention">Calling convention</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The first feature actively used by DSLs in Kotlin is a special calling convention.
+If the last parameter of a method is a function, and you&#8217;re passing a lambda expression there, you can specify
+it outside of parentheses.</p>
+</div>
+<div class="paragraph">
+<p>For example, if one wants to create a function <code>dotimes</code> that takes a number <code>n</code>, a function <code>f</code> and applies
+it, the easiest way to do that is</p>
+</div>
+<div class="listingblock">
+<div class="title">good old dotimes</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">fun dotimes(n: Int, f: () -&gt; Unit) {
+    for (i in 0..n-1) {
+        f()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>dotimes</code> can be called in this way</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">dotimes(5, {
+    println("Hello, Kotlin!")
+})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or, using the lambda parameter convention and placing lambda function outside parentheses.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">dotimes(5) {
+    println("Hello, Kotlin!")
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Moreover, the parentheses can be omitted completely if a lambda is the only parameter of a function. E.g. <code>do5times</code> function
+that takes a lambda as a parameter can be called as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">do5times {
+    println("Hello, Kotlin!")
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But despite being important, that calling convention is just a tiny contribution to DSLs when compared to extension functions.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_extension_functions">Extension functions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Extension functions simply allow you to extend the functionality of a class from the outside.</p>
+</div>
+<div class="listingblock">
+<div class="title">Simple extension function</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">fun String.removeSpaces(): String {
+    return this.filter({ c -&gt; c != ' ' })
+}
+
+print("Hi ! , ext".removeSpaces()) // "Hi!,ext"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, the <code>removeSpace</code> function is defined on the class String which enables an ability to call <code>removeSpaces</code> on any <code>String</code> instance. Unsurprisingly, it removes all the spaces from it. Inside the functions, <code>this</code> refers to the instance of a receiver class and can be omitted like you do when you&#8217;re writing a member function. That might sound complicated if you have never heard about extension functions before, but looking at the result of the compilation might make it much easier to understand.</p>
+</div>
+<div class="listingblock">
+<div class="title">Decompiled java code</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public static String removeSpaces(String $receiver) {
+  StringBuilder sb = new StringBuilder();
+  for (int i = 0; i &lt; $receiver.length(); i++) {
+    char c = $receiver.charAt(i);
+    if (c != ' ') {
+      sb.append(c);
+    }
+  }
+  return sb.toString();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Extension functions are not some kind of magic. It’s not a Groovy-like monkey patching, they get compiled to simple static functions. But that example shows us a very important caveat - extension functions are resolved statically because there is no dispatch mechanism for static methods</p>
+</div>
+<div class="paragraph">
+<p>Even though this snippet is very simple, it can raise another question - "where did the <code>StringBuilder</code> came from?".
+An close look at the first snippet through <code>Java</code> glasses gives the answer - there is no function called <code>filter</code> defined in
+the class String. <code>filter</code> is also an extension function defined in the Kotlin standard library.</p>
+</div>
+<div class="listingblock">
+<div class="title">filter function from kotlin stdlib</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">public inline fun String.filter(predicate: (Char) -&gt; Boolean): String {
+  val destination = StringBuilder()
+  for (index in 0..length - 1) {
+    val element = get(index)
+    if (predicate(element))
+      destination.append(element)
+  }
+  return destination.toString()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Kotlin defines a lot of extension functions for Java classes in the standard library. That&#8217;s why Kotlin is so convenient
+to use. One might notice that the function has an <code>inline</code> modifier on it which explains why decompiled <code>removeSpaces</code> has
+a <code>StringBuilder</code> inside and not a call to <code>filter</code>.</p>
+</div>
+<div class="paragraph">
+<p>Many newcomers to Kotlin use the <code>inline</code> modifier everywhere under the impression that inlining can improve performance. It can,
+but in many cases, inline functions don&#8217;t improve performance at all, they even can make it worse. There is an inspection for that in IntelliJ IDEA.</p>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/inspection.png" alt="inspection"></span></p>
+</div>
+<div class="paragraph">
+<p>There are also some other uses for <code>inline</code> which can be found in <a href="https://kotlinlang.org/docs/reference/inline-functions.html">docs</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_extension_function_on_generic_type">Extension function on generic type</h3>
+<div class="paragraph">
+<p>The Kotlin compiler is smart enough to allow for the definition of extension functions on a certain generic type.
+In this example, <code>toIntArray</code> function can be called only on a collection that contains integers.
+This makes extension functions truly unique, there is no way (without subclassing) to define a method for <code>Collection</code>
+class that can be called only on an <code>Int</code> collection.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">fun Collection&lt;Int&gt;.toIntArray(): IntArray {
+  val result = IntArray(size)
+  var index = 0
+  for (element in this)
+    result[index++] = element
+  return result
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">listOf(1, 2, 3).toIntArray()       // works
+listOf("1", "2", "3").toIntArray() // type error</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If Kotlin has become your native language, you might be wondering now, why I&#8217;m talking about these simple features in an article about DSLs. The thing is, the majority of Kotlin DSLs are based on the expressiveness of the two features mentioned above.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_first_simple_dsl">First simple DSL</h3>
+<div class="paragraph">
+<p>Given the aforementioned features, it&#8217;s very easy to write a first very simple DSL.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s say we need to write an event-based droid fighting platform so that users can provide their own strategies and register them on the platform. For each event the user is interested in, they must provide a callback with the droid&#8217;s behaviour. A droid has an interface with a few methods for defeating other droids. Or, humans if you will.</p>
+</div>
+<div class="listingblock">
+<div class="title">the droid</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">interface Droid {
+  val peopleAround: Boolean
+  val gun: Gun
+
+  fun fire(gun: Gun)
+  fun moveLeft()
+  fun moveRight()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This sounds like an ideal case for DSL and now we need to define a public API which the clients will be happy to use.
+To provide the droid’s behaviour we’ll write a public function.</p>
+</div>
+<div class="listingblock">
+<div class="title">API</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">private val droid: Droid = getDroid() // inaccessible from the public API
+
+public fun on(cmd: String, f: Droid.() -&gt; Unit) {
+// ...
+  droid.f()
+// ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The type of the argument <code>f</code> might look weird, but it&#8217;s just the type of 0-arity extension function on the type Droid. And
+finally, the APIs consumers can register events in the platform.</p>
+</div>
+<div class="listingblock">
+<div class="title">strategy example</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">on("back") {
+  moveLeft()
+  if (peopleAround) {
+    fire(gun)
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, the anonymous extension function is a second parameter and therefore can be written outside parentheses.
+<code>this</code> in the function has a type <code>Droid</code> and therefore <code>moveLeft()</code> as well as other functions and properties can be called by themselves without providing an explicit receiver type..</p>
+</div>
+<div class="paragraph">
+<p>The strategy looks very natural, it clearly says that if our droid receives a <code>back</code> command, it should move left and
+try to shoot some folks around him. The next snippet shows to what it can be compiled to in order to make it even clearer for those who don&#8217;t speak
+kotlin well yet.</p>
+</div>
+<div class="listingblock">
+<div class="title">decompiled java call</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">on("back", new Function1&lt;Droid, Unit&gt;() {
+  public Unit invoke(Droid droid) {
+    droid.moveLeft();
+    if (droid.getPeopleAround()) {
+      droid.fire(droid.getGun());
+    }
+    return Unit.INSTANCE;
+  }
+});</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_html_builders">HTML builders</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Building DSLs using extension functions isn&#8217;t limited to simple droid fighting strategies. For example, it allows us to build a completely typed HTML syntax; HTML builders are even mentioned in the
+<a href="https://kotlinlang.org/docs/reference/type-safe-builders.html">official documentation</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">html builders</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val list = listOf("Kotlin", "is", "awesome")
+val result: HTML =
+  html {
+    head {
+      title { +"HTML DSL in Kotlin" }
+    }
+    body {
+      p {
+        +"a line about Kotlin"
+      }
+      a(href = "jetbrains.com/kotlin") {
+        +"Kotlin"
+      }
+      p {
+        +"Kotlin is:"
+        ul {
+          for (arg in list)
+            li { +arg }
+        }
+      }
+    }
+  }
+println(result)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And these type-safe builders aren&#8217;t a Kotlin invention, on the JVM land they were originated in Groovy. But Groovy is a dynamic language,
+builders there are not type-safe.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+It wouldn&#8217;t be completely fair to say that even though it&#8217;s what Kotlin&#8217;s documentation
+           says, Groovy supports static compilation optionally and there are some ways to compile
+           builders statically as well. (<a href="http://melix.github.io/blog/2013/02/13/static_builders_inception.html" class="bare">http://melix.github.io/blog/2013/02/13/static_builders_inception.html</a>)
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The implementation of a DSL in dynamically typed languages is often very different to statically typed languages. In Kotlin, in order to build a DSL, you need to describe the whole schema of the future language. And given that the result is a deeply nested data structure, the easiest way to convert it to string is to traverse the whole data-structure recursively.</p>
+</div>
+<div class="listingblock">
+<div class="title">base interface</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">interface Element {
+  fun render(builder: StringBuilder, indent: String)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The simplest line of text can be represented as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class TextElement(val text: String) : Element {
+  override fun render(builder: StringBuilder, indent: String) {
+    builder.append("$indent$text\n")
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The real tag representation is a bit more complex</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">abstract class Tag(val name: String) : Element {
+  val children = arrayListOf&lt;Element&gt;()
+  val attributes = hashMapOf&lt;String, String&gt;()
+
+  // open tag
+  // render attributes
+  // render children recursively
+  // close tag
+  override fun render(builder: StringBuilder, indent: String) {
+    builder.append("$indent&lt;$name${renderAttributes()}&gt;\n")
+    for (c in children) {
+      c.render(builder, indent + "  ")
+    }
+    builder.append("$indent&lt;/$name&gt;\n")
+  }
+
+  private fun renderAttributes() = attributes.map { (k, v) -&gt; " $k=\"$v\"" }.joinToString("")
+
+  protected fun &lt;T : Element&gt; initTag(tag: T, init: T.() -&gt; Unit) {
+    tag.init()
+    children.add(tag)
+  }
+
+  operator fun String.unaryPlus() {
+    children.add(TextElement(this))
+  }
+
+  override fun toString(): String {
+    val builder = StringBuilder()
+    render(builder, "")
+    return builder.toString()
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It contains a representation of attributes and a set of children. But the main part that requires attention is the <code>initTag</code>
+function which looks very similar to the function <code>on</code> from the "robot fighting" DSL definition.</p>
+</div>
+<div class="paragraph">
+<p>Another interesting part is an extension function <code>unaryPlus</code> defined as an operator for class String inside the <code>Tag</code>.
+It allows us to use a convenient (but let&#8217;s be honest not obvious at all) way to insert a line of text inside code like:</p>
+</div>
+<div class="listingblock">
+<div class="title">¯\_(ツ)_/¯ unary plus to append a line of text</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">body {
+  +"just a random line"
+  +"another line"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the rest of the DSL is an enumeration of all possible tags.</p>
+</div>
+<div class="listingblock">
+<div class="title">&lt;head&gt;,&lt;title&gt;,&lt;body&gt;,&lt;a&gt;,&lt;ul&gt;,&lt;li&gt;,&lt;p&gt;</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class HTML : Tag("html") {
+  fun head(init: Head.() -&gt; Unit) = initTag(Head(), init)
+
+  fun body(init: Body.() -&gt; Unit) = initTag(Body(), init)
+}
+
+class Head : Tag("head") {
+  fun title(init: Title.() -&gt; Unit) = initTag(Title(), init)
+}
+
+class Title : Tag("title")
+
+abstract class BodyTag(name: String) : Tag(name) {
+  fun p(init: P.() -&gt; Unit) = initTag(P(), init)
+  fun ul(init: UL.() -&gt; Unit) = initTag(UL(), init)
+  fun a(href: String, init: A.() -&gt; Unit) {
+    val a = A()
+    initTag(a, init)
+    a.href = href
+  }
+}
+
+class Body : BodyTag("body")
+class UL : BodyTag("ul") {
+  fun li(init: LI.() -&gt; Unit) = initTag(LI(), init)
+}
+
+class LI : BodyTag("li")
+class P : BodyTag("p")
+
+class A : BodyTag("a") {
+  var href: String
+    get() = attributes["href"] ?: ""
+    set(value) {
+      attributes["href"] = value
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, all these classes define a possible hierarchy of calls. This DSL is just a toy DSL, and therefore it
+covers a very small and limited subset of HTML. It is extremely tedious to write the whole
+HTML DSL manually. The actual <a href="https://github.com/Kotlin/kotlinx.html">HTML DSL implementation</a> uses a real
+<a href="https://github.com/Kotlin/kotlinx.html/blob/master/generate/src/main/resources/html_5.xsd">XSD schema</a> to generate
+all possible classes for the DSL.</p>
+</div>
+<div class="sect2">
+<h3 id="_there_is_always_a_problem">There is always a problem</h3>
+<div class="paragraph">
+<p>This could already be awesome, but the example demonstrates a very weird behaviour — nobody stops you from defining
+tags inside each other multiple times.</p>
+</div>
+<div class="listingblock">
+<div class="title">the problem</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">head {
+  head {
+    head {
+      // stil possible to write head because implicit receiver html is available
+    }
+  }
+  title { +"XML encoding with Kotlin" }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Prior to Kotlin 1.1, the only solution was to redefine function with deprecation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class Head : Tag("head") {
+  @Deprecated(message = "wrong scope", level = DeprecationLevel.ERROR)
+  fun head(init: Head.() -&gt; Unit) = initTag(Head(), init)
+
+  fun title(init: Title.() -&gt; Unit) = initTag(Title(), init)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/err1.png" alt="err1"></span></p>
+</div>
+<div class="paragraph">
+<p>The problem with this approach is that it requires an incredible amount of boilerplate and a full understanding of all
+possible combinations. In 1.1, <a href="https://github.com/Kotlin/KEEP/blob/master/proposals/scope-control-for-implicit-receivers.md">KEEP-57</a> introduced an alternative to that approach: the <code>@DslMarker</code> annotation was introduced which
+allows us to define a <code>DSL marker</code> and introduces a set of rules for classes annotated with that marker:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an implicit receiver may belong to a DSL if marked with a corresponding DSL marker annotation</p>
+</li>
+<li>
+<p>two implicit receivers of the same DSL are not accessible in the same scope</p>
+</li>
+<li>
+<p>the closest one wins</p>
+</li>
+<li>
+<p>other available receivers are resolved as usual, but if the resulting resolved call binds to such a receiver, it&#8217;s a compilation error</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So, the HTML DSL can be fixed by introducing a <code>@HtmlTagMarker</code> DSL marker and annotating <code>Tag</code> with it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">@HtmlTagMarker
+abstract class Tag(val name: String) : Element {
+ // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/err2.png" alt="err2"></span></p>
+</div>
+<div class="paragraph">
+<p></p>
+</div>
+<div class="paragraph">
+<p>DSLs that give us an ability to construct nested data structures such as HTML builders, different configurations, UI builders, etc. is
+where Kotlin really shines. Kotlin took an awesome idea from Groovy and made it safe and easy to use.</p>
+</div>
+<div class="paragraph">
+<p>There are a few more examples of DSLs of that kind:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://blog.jetbrains.com/teamcity/2016/11/kotlin-configuration-scripts-an-introduction/">TeamCity DSL</a></p>
+</li>
+<li>
+<p><a href="http://github.com/gradle/gradle-script-kotlin">Gradle with Kotlin</a></p>
+</li>
+<li>
+<p><a href="http://github.com/gradle/gradle-script-kotlin">Anko</a></p>
+</li>
+<li>
+<p><a href="http://spekframework.org">Spek framework</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>But unsurprisingly, it&#8217;s not the only type of DSL that can be implemented in Kotlin&#8230;&#8203;</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fantastic_dsl">Fantastic DSL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Not all domains are born the same. Let&#8217;s consider a completely different domain. A system which handles transactions
+containing a payment in some currency and two people - a sender and a receiver.</p>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/domain.svg" alt="domain"></span></p>
+</div>
+<div class="paragraph">
+<p>The transaction structure has to be immutable to make it safer. But sometimes, we might need to create a new transaction with an updated field. For example, the name of the receiver (from) person might need to be changed to let&#8217;s say "John". There are a few ways to implement that in Kotlin</p>
+</div>
+<div class="sect2">
+<h3 id="_data_classes">Data classes</h3>
+<div class="paragraph">
+<p>Let&#8217;s start with an idiomatic Kotlin way. The class hierarchy can be concisely represented as</p>
+</div>
+<div class="listingblock">
+<div class="title">data</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">data class Transaction(val payment: Payment, val parts: Parts)
+data class Payment(val currency: String, val amount: Int)
+data class Parts(val from: Person, val to: Person)
+data class Person(val id: Int, val name: String)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An instance of the <code>Transaction</code> can easily be created as well</p>
+</div>
+<div class="listingblock">
+<div class="title">create</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val trs = Transaction(
+  Payment("AUD", 15),
+  Parts(
+    Person(0, "Alex"),
+    Person(1, "Ben")
+  )
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But problems start when we need to update this nested data structure. Generally, there two ways to do that. The first option is to completely recreate the transaction which doesn&#8217;t look good.</p>
+</div>
+<div class="listingblock">
+<div class="title">update [1]</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val trans = Transaction(trs.payment, Parts(
+  Person(trs.parts.from.id, "John"),
+  trs.parts.to)
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another is to use <a href="https://kotlinlang.org/docs/reference/data-classes.html#copying">copy</a></p>
+</div>
+<div class="listingblock">
+<div class="title">update [2]</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val stansTrs2 = trs.copy(
+  parts = trs.parts.copy(
+    from = trs.parts.from.copy(
+      name = "John"
+    )
+  )
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the copy version doesn’t look good either. Even though it’s tolerable now, the bigger the data structure,
+the uglier the code look like. On a deeply nested immutable data structure, it looks like a triangle instead of a
+simple call chain from the mutable world.</p>
+</div>
+<div class="listingblock">
+<div class="title">ohhhh</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val stansTrs2 = trs.copy(
+  parts = trs.parts.copy(
+    from = trs.parts.from.copy(
+      person = trs.parts.from.person.copy(
+        parts = trs.parts.from.person.parts.copy(
+          from = trs.parts.from.person.parts.from.copy(
+            person = trs.parts.from.person.parts.from.person.copy(
+              parts = trs.parts.from.person.parts.from.person.parts.copy(
+                from = trs.parts.from.person.parts.from.person.parts.from.copy(
+                  person = trs.parts.from.person.parts.from.person.parts.from.person.copy(
+                    parts = trs.parts.from.person.parts.from.person.parts.from.person.parts.copy(
+                      from = trs.parts.from.person.parts.from.person.parts.from.person.parts.from.copy(
+                        name = "jonh"
+                      ))))))))))))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Don&#8217;t get me wrong, I like parentheses. It feels like a lisp (which I like a lot), but what no one likes is the wall of boilerplate above.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_persistent_data_structures">Persistent Data Structures</h3>
+<div class="paragraph">
+<p>But talking about lisps, there is another awesome language called Clojure. It&#8217;s a lisp running on JVM where every data structure is persistent (don&#8217;t confuse with <a href="https://stackoverflow.com/questions/10034537/persistent-vs-immutable-data-structure">immutable</a>). In Clojure, the same problem can be solved by defining the transaction structure as a persistent map.</p>
+</div>
+<div class="listingblock">
+<div class="title">create</div>
+<div class="content">
+<pre class="highlight"><code class="language-clojure" data-lang="clojure">(def ts {:payment {:currency "AUD"
+                   :amount   15}
+         :parts   {:from {:id   0
+                          :name "Alex"}
+                   :to   {:id   1
+                          :name "Ben"}}})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Not as concise as Kotlin&#8217;s version, but still pretty good. What is completely different to Kotlin, is the update function</p>
+</div>
+<div class="listingblock">
+<div class="title">update</div>
+<div class="content">
+<pre class="highlight"><code class="language-clojure" data-lang="clojure">(def ts2 (assoc-in ts [:parts :from :name] "John"))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s only one line! And it&#8217;s exactly what we aimed for. The next picture might be essential for understanding how it works.</p>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/domain_clj.svg" alt="domain clj"></span></p>
+</div>
+<div class="paragraph">
+<p>Given that each node has a known type - <code>clojure.lang.APersistentMap</code> - and the universal way of traversing is <code>map.get("key")</code>,
+it&#8217;s possible to write a function <code>assoc-in</code> which can change a value under a given "path" and to recreate
+the data structure <a href="http://cjohansen.no/clojure-to-die-for/">node by node</a>. But Clojure&#8217;s internals are plain java classes that
+can be used from Kotlin easily just with a few "convenience" adapters to keep familiar syntax.</p>
+</div>
+<div class="listingblock">
+<div class="title">create</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val tran = pArrayMap(
+  "payment" to pArrayMap(
+    "currency" to "AUD",
+    "amount" to 15
+  ),
+  "parts" to pArrayMap(
+    "from" to pArrayMap(
+      "id" to 0,
+      "name" to "Alex"
+    ),
+    "to" to pArrayMap(
+      "id" to 1,
+      "name" to "Ben"
+    )
+  )
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Yes, the creation looks rather ugly. It&#8217;s untyped, all the key names are represented as strings, but let&#8217;s look at the update function.</p>
+</div>
+<div class="listingblock">
+<div class="title">update</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val trans2 = trans.pUpdate(listOf("parts", "from", "name"), "John")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s still as concise and beautiful as Clojure&#8217;s one.</p>
+</div>
+<div class="paragraph">
+<p>But is it possible to build a DSL which keeps types from Kotlin types and provides the conciseness of Clojure?</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cursor_dsl">Cursor DSL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It is possible! Using a special DSL, you can define the structure of the "transactional" domain in a following way.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">interface Transaction
+val &lt;F&gt; Cursor&lt;Transaction, F&gt;.payment by Node&lt;Payment&gt;()
+val &lt;F&gt; Cursor&lt;Transaction, F&gt;.parts by Node&lt;Parts&gt;()
+
+interface Payment
+val &lt;F&gt; Cursor&lt;Payment, F&gt;.currency by Leaf&lt;String&gt;()
+val &lt;F&gt; Cursor&lt;Payment, F&gt;.amount by Leaf&lt;Int&gt;()
+
+interface Parts
+val &lt;F&gt; Cursor&lt;Parts, F&gt;.to by Node&lt;Person&gt;()
+val &lt;F&gt; Cursor&lt;Parts, F&gt;.from by Node&lt;Person&gt;()
+
+interface Person
+val &lt;F&gt; Cursor&lt;Person, F&gt;.id by Leaf&lt;Int&gt;()
+val &lt;F&gt; Cursor&lt;Person, F&gt;.name by Leaf&lt;String&gt;()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This looks scary, but it&#8217;s just a bit of necessary boilerplate. This code should be read like</p>
+</div>
+<style>
+    .prh-keyword {
+        color: #000080;
+        font-weight: bold;
+    }
+    .prh-boilerplate {
+        opacity: 0.2;
+    }
+</style>
+<pre style="margin: 0; background: white; line-height: 125%">
+<span class="prh-keyword">interface</span> Transaction
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Transaction<span class="prh-boilerplate">, F&gt;</span>.payment <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Payment<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Transaction<span class="prh-boilerplate">, F&gt;</span>.parts <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Parts<span class="prh-boilerplate">&gt;()</span>
+
+<span class="prh-keyword">interface</span> Payment
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Payment<span class="prh-boilerplate">, F&gt;</span>.currency <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>String<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Payment<span class="prh-boilerplate">, F&gt;</span>.amount <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>Int<span class="prh-boilerplate">&gt;()</span>
+
+<span class="prh-keyword">interface</span> Parts
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Parts<span class="prh-boilerplate">, F&gt;</span>.to <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Person<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Parts<span class="prh-boilerplate">, F&gt;</span>.from <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Person<span class="prh-boilerplate">&gt;()</span>
+
+<span class="prh-keyword">interface</span> Person
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Person<span class="prh-boilerplate">, F&gt;</span>.id <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>Int<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Person<span class="prh-boilerplate">, F&gt;</span>.name <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>String<span class="prh-boilerplate">&gt;()</span>
+</pre>
+<br/>
+<div class="paragraph">
+<p>The creation looks very similar to the untyped version, but it&#8217;s completely typed. It references properties defined above.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val trans = domain&lt;Transaction&gt; {
+  (payment) {
+    currency.set("AUD")
+    amount.set(15)
+  }
+  (parts) {
+    (from) {
+      id.set(0)
+      name.set("Alex")
+    }
+    (to) {
+      id.set(1)
+      name.set("Ben")
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s possible to update the transaction easily. And not just one field, in fact, the code above creates an empty
+data structure and applies an update function to it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val trans2 = trans.cursor.parts.from.update {
+  name.set("John")
+}
+println(trans.cursor.parts.from.name.value) // "Alex"
+println(trans2.cursor.parts.from.name.value) // "John"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val trans3 = trans2.cursor.update {
+  (payment) {
+    currency.set("USD")
+    amount.set(12)
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What is really awesome is that the <code>set</code> function can only be called inside the <code>update</code> block. It&#8217;s possible to think about the <code>update</code>
+block as an open transaction where a few updates are applied.</p>
+</div>
+<div class="sect2">
+<h3 id="_implementation">Implementation</h3>
+<div class="sect3">
+<h4 id="_read">Read</h4>
+<div class="paragraph">
+<p>The easiest way to start implementing it is to imagine that the data structure is already created and everything we need to do is to read
+a value from it. The obvious untyped solution will be to call <code>trans.get("parts").get("from").get("name")</code>. And this
+approach works fine until we need to update it. After the first <code>get</code> call, the reference to the root transaction is lost
+and there&#8217;ll be no way to run the update operation.</p>
+</div>
+<div class="paragraph">
+<p>Instead, it&#8217;s possible to focus on the way of traversing the data structure without loosing the reference to the root. To accomplish this, it&#8217;s possible to implement <code>Focus</code> interface which holds the reference to the root and accumulates a path inside.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">interface Focus&lt;out Op&gt; {
+  fun narrow(k: String): Focus&lt;Op&gt;
+  val op: Op
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The interesting thing that <code>Focus</code> is parametrised over an operation. That operation can be <code>Read</code> or <code>Write</code> depending on the context.
+When a leaf is reached, the typed version will finally perform an action using that operation.</p>
+</div>
+<div class="listingblock">
+<div class="title">narrow down the usage</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">val f = Focus(trans)       // {"root" -&gt; Transaction, path -&gt; []}
+val f2 = f.narrow("parts") // {"root" -&gt; Transaction, path -&gt; ["parts"]}
+val f3 = f2.narrow("from") // {"root" -&gt; Transaction, path -&gt; ["parts", "from"]}
+// ...</code></pre>
+</div>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/domain_focus.svg" alt="domain focus"></span></p>
+</div>
+<div class="paragraph">
+<p>But even though the focus does its job very well, it&#8217;s completely untyped, and strings have to be used to navigate through.
+The type must be stored somewhere. As everyone knows that any problem can be solved with an additional
+layer of abstraction! Let&#8217;s define a wrapper parametrised over the type of an underlying node.</p>
+</div>
+<div class="listingblock">
+<div class="title">the missed layer</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class Cursor&lt;out T, out Op&gt;(val f: Focus&lt;Op&gt;)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Cursor</code> is parametrised over a node type and the <code>operation</code> is derived from the focus. And now, the <code>Transaction</code> definition starts making sense. The narrowing can be delegated to the <code>Node</code> object that knows the type and uses the name of a property to create a new <code>Cursor</code> with a new <code>Focus</code> inside.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">interface Transaction
+val &lt;F&gt; Cursor&lt;Transaction, F&gt;.payment by Node&lt;Payment&gt;()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, the <code>payment</code> is an extension property on the <code>Transaction</code> type which is just a marker interface. It will never be
+instantiated, instead by delegating property to <code>Node&lt;Payment&gt;</code>, the conversion
+<code>Cursor&lt;Transacton, F&gt; &#8658; Cursor&lt;Payment, F&gt;</code> will be made.</p>
+</div>
+<div class="listingblock">
+<div class="title">how Node is defined</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">open class Node&lt;out T&gt; {
+  open operator fun &lt;Op&gt; getValue(ref: Cursor&lt;*, Op&gt;, property: KProperty&lt;*&gt;): Cursor&lt;T, Op&gt; {
+    return Cursor(ref.f.narrow(property.name))
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Inside <code>Node</code>, a new Cursor is created with the focus narrowing down using a property name. Using this technique,
+by just calling extension properties a focus can narrow down to the last node where the last node is delegated to <code>Leaf</code>
+instead of <code>Node</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">interface Person
+val &lt;F&gt; Cursor&lt;Person, F&gt;.name by Leaf&lt;String&gt;()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Leaf&lt;V&gt;</code> is defined in the same way as Node except for the return value of <code>getValue</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">open class Leaf&lt;out V&gt; {
+  open operator fun &lt;Op&gt; getValue(ref: Cursor&lt;*, Op&gt;, property: KProperty&lt;*&gt;): Cursor&lt;Leaf&lt;V&gt;, Op&gt; {
+    return Cursor(ref.f.narrow(property.name))
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Leaf is needed to define an extension property that allows reading a
+ value from that node. The property has the following signature <code>val &lt;V, T&gt; Cursor&lt;Leaf&lt;V&gt;, Read&lt;T&gt;&gt;.value: V</code> which
+ says: given the cursor focused on a leaf and parametrised over a read operation, provide a value contained by the leaf.</p>
+</div>
+<div class="paragraph text-center">
+<p><span class="image"><img src="/img/fantastic/domain_red.png" alt="domain red"></span></p>
+</div>
+<div class="paragraph">
+<p>The remaining logic is described below</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">// the main data structure where T type - is the root type
+// in our case, T is Transaction.
+// root is just an empty persisntent map
+class Domain&lt;out T&gt;(val root: PMap = PHashMap.EMPTY)
+
+// The read operation that focus owns (Op)
+interface Read&lt;out M&gt; {
+  val path: Path         // path to the current node (ex. ["payment", "currency"])
+  val domain: Domain&lt;M&gt;  // the reference to the root
+}
+
+// the implementation of the focus
+class Reader&lt;out T&gt;(val p: Path, val dm: Domain&lt;T&gt;) : Focus&lt;Read&lt;T&gt;&gt; {
+  // this is how narrowing happens, just extend the path and keep the refernce to the root
+  override fun narrow(k: String): Focus&lt;Read&lt;T&gt;&gt; = Reader(p.append(k), dm)
+
+  override val op: Read&lt;T&gt; = object : Read&lt;T&gt; {
+    override val domain: Domain&lt;T&gt; = dm
+    override val path: Path = p
+  }
+}
+
+// take a focus, take a read operation from it and ask for value
+// by traversing the root using path
+val &lt;V, T&gt; Cursor&lt;Leaf&lt;V&gt;, Read&lt;T&gt;&gt;.value: V
+  get() = f.op.path.getIn(f.op.domain.root) as V
+
+// this is how cursor get's created, emtpy path and reference to the root
+val &lt;T&gt; Domain&lt;T&gt;.cursor: Cursor&lt;T, Read&lt;T&gt;&gt;
+  get() = Cursor(Reader(Path.EMPTY, this))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_update">Update</h4>
+<div class="paragraph">
+<p>So far we can traverse the data structure and read values from it. The next step is to learn how to update it. Problems start when we realise that the underlying data structure is persistent and there is no way to mutate it. To emulate mutation, a special wrapper has to be defined. It reassigns the reference after each mutation.</p>
+</div>
+<div class="listingblock">
+<div class="title">immutable &#8658; mutable</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class Mutable(var m: PMap) {
+  fun write(p: Path, a: Any?) {
+    m = p.assocIn(m, a)
+  }
+
+  fun read(p: Path) = p.getIn(m)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, we&#8217;ll need to implement the <code>Write</code> operation which supports reading and writing under a specific path. At first glance,
+<code>read</code> operation is unnecessary, but it&#8217;s needed to read the final result after all modification were applied using an empty path. Another application of the <code>read()</code> operation is node initialisation. E.g. if you create an empty domain and decide to write a value to leaf using a cursor, all the parent nodes need to be initialised first.</p>
+</div>
+<div class="listingblock">
+<div class="title">Op for <code>Cursor&lt;T, Write&gt;</code></div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">interface Write {
+  fun read(): Any?
+  fun write(a: Any?)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the corresponding cursor</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class WriterCursor(val m: Mutable, val path: Path) : Focus&lt;Write&gt; {
+  // exactly the same narrowing pattern
+  override fun narrow(k: String): Focus&lt;Write&gt; = WriterCursor(m, path.append(k))
+
+  override val op: Write = object : Write {
+    override fun write(a: Any?) = m.write(path, a)
+    override fun read(): Any? = m.read(path)
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And at some point in time, we might want to switch from the <code>Read</code> cursor to the <code>Write</code> cursor. For that, a special function exists.</p>
+</div>
+<div class="listingblock">
+<div class="title">Cursor&lt;T, Read&gt; &#8658; Cursor&lt;T, Write&gt;</div>
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">fun &lt;T, M&gt; Cursor&lt;M, Read&lt;T&gt;&gt;.update(update: Cursor&lt;M, Write&gt;.() -&gt; Unit): Domain&lt;T&gt; {
+  // take a root, make a mutable from it
+  val m = Mutable(f.op.domain.root)
+  // create a writer from mutable and apply `update` supplied from outside
+  // exactly the same pattern as any other DSL has
+  Cursor&lt;M, Write&gt;(WriterCursor(m, f.op.path)).update()
+  // read the final value from the root and return a new instance of Domain
+  return Domain(m.read(Path.EMPTY) as PMap)
+}
+
+// to simplify the initialisation
+fun &lt;M&gt; domain(f: Cursor&lt;M, Write&gt;.() -&gt; Unit) = Domain&lt;M&gt;().cursor.update(f)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And finally, a set of public typed operation that API consumers use</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">// for each leaf initial value is null
+// for each node initial value is empty persistent map
+fun Write.init(k: KClass&lt;*&gt;) {
+  if (read() == null) {
+    write(when (k) {
+      Leaf::class -&gt; null
+      else -&gt; PArrayMap.EMPTY
+    })
+  }
+}
+
+operator inline fun &lt;reified T&gt; Cursor&lt;T, Write&gt;.invoke(
+    updateFn: Cursor&lt;T, Write&gt;.() -&gt; Unit): Unit {
+  // init the current node (it might be null if we haven't visited it before)
+  f.op.init(T::class)
+  updateFn()
+}
+
+fun &lt;T&gt; Cursor&lt;Leaf&lt;T&gt;, Write&gt;.set(t: T): Unit {
+  // just delegate to write
+  f.op.write(t)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>invoke</code> function is responsible for Node initialisation whereas <code>set</code> sets the Leaf&#8217;s value</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">domain&lt;Transaction&gt; {
+  (payment) {  // &lt;- here invoke is called
+    currency.set("AUD")
+    amount.set(15)
+  }
+}
+
+// ↑ is equal to the desugarised version ↓
+domain&lt;Transaction&gt; {
+  payment.invoke({
+    currency.set("AUD")
+    amount.set(15)
+  })
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And at the end, a Path that does all the work, but in fact, it does nothing except for delegating functionality to functions from
+Clojure that do all the work on untyped persistent data structures.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import clojure.`core$assoc_in` as assocIn
+import clojure.`core$get_in` as getIn
+import clojure.lang.*
+
+data class Path(private val v: APersistentVector) {
+  companion object {
+    val EMPTY = Path(PersistentVector.EMPTY)
+  }
+
+  fun append(a: String): Path = Path(v.cons(a) as APersistentVector)
+  fun getIn(model: Any?): Any? = getIn.invokeStatic(model, v)
+  fun assocIn(m: Any?, a: Any?): Any? = assocIn.invokeStatic(m, v, a)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using these primitives, we built a really powerful type safe DSL to work on immutable data structures. Yes, it has a few downsides.
+E.g. data classes solution has better performance. And most of the time it&#8217;s concise enough, unless you have a really
+deeply nested tree.
+In that case, you might also try to use <a href="https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing">the lenses pattern</a>
+which comes from the functional world and solves the same problem. But if you already have untyped data structures in your project
+and have to work with them, Kotlin provides a truly unique set of features that allows you to build a powerful DSL to make your life
+safer and easier.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s very probable that some parts of the solution shown above might still be unclear, in that case, I encourage you to clone <a href="https://github.com/SerCeMan/talk-fantastic-dsls-example">the code example</a> in your IDE, run it and try to play with types. It will help a lot and can give you some interesting ideas on how advanced Kotlin features can be used.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusions">Conclusions</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Kotlin provides many unique features to build DSLs easily</p>
+</li>
+<li>
+<p>DSLs in Kotlin work best as configuration APIs</p>
+</li>
+<li>
+<p>They can be a powerful abstraction over untyped data structures</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_warnings">Warnings</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Most of the time plain code is better than DSL<br>
+There is no point in building DSL "just because I can", plain Kotlin code is often much easier to read and understand.</p>
+</li>
+<li>
+<p>Provide a way to extend and bypass your DSL<br>
+If you publish DSL as a part of your API, it&#8217;s always a good idea to give a way to bypass or extend it. Of course, if it&#8217;s a Gradle-like DSL then you can cover everything. But in the case of a html DSL, a user might want to introduce some tags that your DSL doesn&#8217;t support. Or, he can have an already rendered string which needs to be inserted somewhere.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_links">Links</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/SerCeMan/talk-fantastic-dsls-example">Cursor DSL source code</a></p>
+</li>
+<li>
+<p>Why you should use DSLs: <a href="http://jonnyzzz.com/blog/2016/09/02/dsl-building/">Building DSL Instead of an IDE Plugin</a></p>
+</li>
+<li>
+<p>Why you shouldn&#8217;t: <a href="https://victor.kropp.name/blog/kotlin-dsls-good-bad-and-ugly/">DSLs in Kotlin: The Good, the Bad and the Ugly</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_thanks">Thanks</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Kotlin team for creating an awesome language! <br>
+Please, press a ★ button on the <a href="https://github.com/JetBrains/kotlin">Kotlin&#8217;s GitHub repo</a> if you haven&#8217;t done it yet.</p>
+</li>
+<li>
+<p><a href="https://twitter.com/jetzajac">@JetZajac</a> who initially came up with the idea of persistent data structure based DSLs</p>
+</li>
+<li>
+<p>You for reading it</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_share_this_article">Share this article</h3>
+<hr>
+</div>
+</div>
+</div>
+</div>
+
+<div id="post-tags">
+    <b>Tags: </b>
+    
+    <a href="/tags/kotlin/">kotlin</a>
+    
+    <a href="/tags/persistent data structures/">persistent data structures</a>
+    
+    <a href="/tags/dsl/">dsl</a>
+    
+    <a href="/tags/html/">html</a>
+    
+</div>
+
+
+                <div id="prev-next">
+                    
+                    
+                    <a class="right" href="/posts/01-06-2016-wild-panama/">Pure assembly in the forest of Panama &raquo;</a>
+                    
+                </div>
+
+                
+                <div id="disqus_thread"></div>
+                <script type="text/javascript">
+                    (function () {
+                        var dsq = document.createElement('script');
+                        dsq.type = 'text/javascript';
+                        dsq.async = true;
+                        dsq.src = '//serceman.disqus.com/embed.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                    })();
+                </script>
+                
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    <footer>Copyright &copy;  Sergey Tselovalnikov
+    </footer>
+</div>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="/js/highlight.pack.js" type="text/javascript"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-77409445-1', 'auto');
+  ga('send', 'pageview');
+</script>
+</body>
+</html>

@@ -613,7 +613,7 @@ loop:
 </tbody>
 </table>
 <div class="paragraph">
-<p>But that if we need more performance? Can we do it better than GCC?</p>
+<p>But what if we need more performance? Can we do it better than GCC?</p>
 </div>
 </div>
 <div class="sect2">
@@ -741,7 +741,7 @@ private static int JAVA_avxChecksumAVX2(ByteBuffer buffer, long target, int targ
 </div>
 </div>
 <div class="paragraph">
-<p>Now it is written in the right way. We wrote a lot of small methods; every method represents one small AVX2 instruction. And the main loop is written in Java. This code is reusable; it is much easier to write and understand than trying to write one big ASM blob. But, a big surprise, it is much slower than an ugly ASM blob.</p>
+<p>Now it is written in the right way. We wrote a lot of small methods; every method represents one small AVX2 instruction. And the main loop is written in Java. This code is reusable; it is much easier to write and understand than trying to write one big ASM blob. But, a big surprise, it is much slower than the ugly ASM blob.</p>
 </div>
 <div class="paragraph">
 <p>And again, JMH will help us to find answer with gc profiler.</p>
@@ -891,7 +891,7 @@ ChecksumBenchmark.plainJava      129536  avgt    4  33.503 ±  0.227  us/op</pre
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_thanks">Thanks</h3>
+<h3 id="_thanks_to">Thanks to</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -908,6 +908,13 @@ ChecksumBenchmark.plainJava      129536  avgt    4  33.503 ±  0.227  us/op</pre
 </li>
 </ul>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_share_this_article">Share this article</h3>
+<hr>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Just wrote a new blog post about current state of Machine Code Snippets (and little bit of Vector API) in Panama <a href="https://t.co/Qdqihp2Mrj">https://t.co/Qdqihp2Mrj</a></p>&mdash; Sergey Tselovalnikov (@SerCeMan) <a href="https://twitter.com/SerCeMan/status/737889841132752896">June 1, 2016</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr>
 </div>
 </div>
 </div>
@@ -930,6 +937,8 @@ ChecksumBenchmark.plainJava      129536  avgt    4  33.503 ±  0.227  us/op</pre
 
 
                 <div id="prev-next">
+                    
+                    <a href="/posts/29-06-2017-fantastic-dsls/">&laquo; Fantastic DSLs and where to find them</a>
                     
                     
                     <a class="right" href="/posts/22-06-2015-jnr-fuse/">JNR-FUSE: library for using FUSE from Java &raquo;</a>
