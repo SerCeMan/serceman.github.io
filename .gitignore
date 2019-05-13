@@ -16,6 +16,9 @@ pom.xml.asc
 resources/public
 
 
+.DS_STore
+
+
 ### Leiningen ###
 pom.xml
 pom.xml.asc
