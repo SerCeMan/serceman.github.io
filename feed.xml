@@ -12,11 +12,762 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Thu, 29 Jun 2017 21:48:40 +1000
+Thu, 16 May 2019 18:14:26 +1000
 </lastBuildDate>
 <generator>
 clj-rss
 </generator>
+<item>
+<guid>
+http://serce.me/posts/16-05-2019-the-matter-of-time/
+</guid>
+<link>
+http://serce.me/posts/16-05-2019-the-matter-of-time/
+</link>
+<title>
+The matter of time()
+</title>
+<description>
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Hi!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As software engineers, we all rely on the notion of time: a crucial concept in ensuring that events in our programs follow a chronological order. Yet, invoking a simple call to “get the current time” can potentially yield unexpected results and lead to unforeseen consequences if not used correctly. Moreover, the invariants about time we observe on our local development machine may not necessarily hold in the cloud, or in any distributed system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this article, I’ll go through the different ways we can obtain the current time in our programs, and present cases where our intuitions and expectations of time from these clocks may mislead us at best or cause catastrophic failures at worst.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/time/time_1.png&quot; alt=&quot;time 1&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;blockquote&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;What would be the biological reality of planet earth rotating once every eighteen hours instead of twenty-four? You have less time, but you have more days in the year. So there’s a sense of losing something, and also gaining something. With an 18-hour clock there’s a lot more yesterdays.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;div class=&quot;attribution&quot;&gt;
+&amp;#8212; Untitled (Clock)&lt;br&gt;
+&lt;cite&gt;2014&lt;/cite&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock warning&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Warning&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+This article is illustrated with examples of code in Java. However, most of the content of this article is applicable to any language or runtime.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_your_local_clocks&quot;&gt;Your local clocks&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Let me start by asking you six questions. Here is a set of code snippets. Is it possible that the expression passed to &lt;code&gt;isThisPossible&lt;/code&gt; is true? Take a guess.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a id=&quot;aq1&quot;&gt;&lt;/a&gt;1. Is this possible?&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;long t1 = System.currentTimeMillis();
+long t2 = System.currentTimeMillis();
+
+isThisPossible(t2 - t1 == 0);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;btn-group btn-group-toggle btn-group-justified&quot; data-toggle=&quot;buttons&quot;&gt;
+  &lt;label class=&quot;btn btn-success&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q1&quot; id=&quot;yes&quot; autocomplete=&quot;off&quot; value=&quot;yes&quot;&gt;Yes
+  &lt;/label&gt;
+  &lt;label class=&quot;btn btn-danger&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q1&quot; id=&quot;no&quot; autocomplete=&quot;off&quot; value=&quot;no&quot;&gt;No
+  &lt;/label&gt;
+&lt;/div&gt;
+&lt;br/&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a id=&quot;aq2&quot;&gt;&lt;/a&gt;2. Is this possible?&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;long t1 = System.nanoTime();
+long t2 = System.nanoTime();
+
+isThisPossible(t2 - t1 == 0);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;btn-group btn-group-toggle btn-group-justified&quot; data-toggle=&quot;buttons&quot;&gt;
+  &lt;label class=&quot;btn btn-success&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q2&quot; id=&quot;yes&quot; autocomplete=&quot;off&quot; value=&quot;yes&quot;&gt;Yes
+  &lt;/label&gt;
+  &lt;label class=&quot;btn btn-danger&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q2&quot; id=&quot;no&quot; autocomplete=&quot;off&quot; value=&quot;no&quot;&gt;No
+  &lt;/label&gt;
+&lt;/div&gt;
+&lt;br/&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a id=&quot;aq3&quot;&gt;&lt;/a&gt;3. Is this possible?&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;long t1 = System.currentTimeMillis();
+long t2 = System.currentTimeMillis();
+
+isThisPossible(t2 &amp;lt; t1);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;btn-group btn-group-toggle btn-group-justified&quot; data-toggle=&quot;buttons&quot;&gt;
+  &lt;label class=&quot;btn btn-success&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q3&quot; id=&quot;yes&quot; autocomplete=&quot;off&quot; value=&quot;yes&quot;&gt;Yes
+  &lt;/label&gt;
+  &lt;label class=&quot;btn btn-danger&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q3&quot; id=&quot;no&quot; autocomplete=&quot;off&quot; value=&quot;no&quot;&gt;No
+  &lt;/label&gt;
+&lt;/div&gt;
+&lt;br/&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a id=&quot;aq4&quot;&gt;&lt;/a&gt;4. Is this possible?&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;long t1 = System.nanoTime();
+long t2 = System.nanoTime();
+
+isThisPossible(t2 &amp;lt; t1);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;btn-group btn-group-toggle btn-group-justified&quot; data-toggle=&quot;buttons&quot;&gt;
+  &lt;label class=&quot;btn btn-success&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q4&quot; id=&quot;yes&quot; autocomplete=&quot;off&quot; value=&quot;yes&quot;&gt;Yes
+  &lt;/label&gt;
+  &lt;label class=&quot;btn btn-danger&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q4&quot; id=&quot;no&quot; autocomplete=&quot;off&quot; value=&quot;no&quot;&gt;No
+  &lt;/label&gt;
+&lt;/div&gt;
+&lt;br/&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a id=&quot;aq5&quot;&gt;&lt;/a&gt;5. Is this possible?&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;long t1 = System.currentTimeMillis();
+
+isThisPossible(t1 &amp;lt; 0);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;btn-group btn-group-toggle btn-group-justified&quot; data-toggle=&quot;buttons&quot;&gt;
+  &lt;label class=&quot;btn btn-success&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q5&quot; id=&quot;yes&quot; autocomplete=&quot;off&quot; value=&quot;yes&quot;&gt;Yes
+  &lt;/label&gt;
+  &lt;label class=&quot;btn btn-danger&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q5&quot; id=&quot;no&quot; autocomplete=&quot;off&quot; value=&quot;no&quot;&gt;No
+  &lt;/label&gt;
+&lt;/div&gt;
+&lt;br/&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a id=&quot;aq6&quot;&gt;&lt;/a&gt;6. Is this possible?&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;long t1 = System.nanoTime();
+
+isThisPossible(t1 &amp;lt; 0);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;btn-group btn-group-toggle btn-group-justified&quot; data-toggle=&quot;buttons&quot;&gt;
+  &lt;label class=&quot;btn btn-success&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q6&quot; id=&quot;yes&quot; autocomplete=&quot;off&quot; value=&quot;yes&quot;&gt;Yes
+  &lt;/label&gt;
+  &lt;label class=&quot;btn btn-danger&quot;&gt;
+    &lt;input type=&quot;radio&quot; name=&quot;q6&quot; id=&quot;no&quot; autocomplete=&quot;off&quot; value=&quot;no&quot;&gt;No
+  &lt;/label&gt;
+&lt;/div&gt;
+&lt;br/&gt;
+&lt;button id=&quot;checkquizres&quot; class=&quot;btn btn-default btn-group-justified&quot; type=&quot;button&quot; data-toggle=&quot;collapse&quot; data-target=&quot;#collapseExample&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;collapseExample&quot;&gt;
+  Check results
+&lt;/button&gt;
+&lt;div class=&quot;collapse&quot; id=&quot;collapseExample&quot;&gt;
+  &lt;script&gt;
+  var answer = function(i, m1, m2) {
+      var m = {
+        'yes': m1,
+        'no': m2,
+        undefined: &quot;Wasn't answered&quot;
+      }[$('input[name=q' + i + ']:checked').val()]
+      $('#sqr' + i).text(i + ') ' + m)
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    $('#checkquizres').on('click', function () {
+      answer(1,
+        &quot;Yes, it's definitely possible&quot;,
+        &quot;Actually, It is possible&quot;
+      )
+      answer(2,
+        &quot;Yes, it's possible, but it depends on underlying the system&quot;,
+        &quot;Actually, it is possible but it depends on the underlying system&quot;
+      )
+      answer(3,
+        &quot;Yes, it's possible&quot;,
+        &quot;No, it is possible&quot;
+      )
+      answer(4,
+        &quot;Yes, it's possible but almost impossible to reproduce and it depends on the underlying system&quot;,
+        &quot;It is possible but almost impossible to reproduce and it depends on the underlying system&quot;
+      )
+      answer(5,
+        &quot;No, it's not possible, at least something is not possible&quot;,
+        &quot;Spot on, it's not possible!&quot;
+      )
+      answer(6,
+        &quot;It is possible according to the documentation&quot;,
+        &quot;No, it is possible according to the documentation&quot;
+      )
+    })
+  })
+  &lt;/script&gt;
+  &lt;div id=&quot;showquizres&quot; class=&quot;well&quot;&gt;
+    &lt;p id=&quot;sqr1&quot;&gt;&lt;/p&gt;
+    &lt;p id=&quot;sqr2&quot;&gt;&lt;/p&gt;
+    &lt;p id=&quot;sqr3&quot;&gt;&lt;/p&gt;
+    &lt;p id=&quot;sqr4&quot;&gt;&lt;/p&gt;
+    &lt;p id=&quot;sqr5&quot;&gt;&lt;/p&gt;
+    &lt;p id=&quot;sqr6&quot;&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;br/&gt;
+&lt;br/&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Was the result surprising? My sincere kudos if it was not. The next section of the article will explain why certain behaviour can or can not be observed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;But why do we even care? Very often we don’t need to, but the snippets of code where the business logic relies on the observed timestamps are typically critical pieces of infrastructure code where correctness is a must. False assumptions in these parts of the code can lead to huge incidents. This, for instance, happened to &lt;a href=&quot;https://blog.cloudflare.com/how-and-why-the-leap-second-affected-cloudflare-dns/&quot;&gt;Cloudflare in 2017&lt;/a&gt;, where the root cause &quot;was the belief that time cannot go backwards&quot;. Cloudflare is one of the few companies that openly publishes incident reports, but it&amp;#8217;s not uncommon to suffer from such false assumptions, as a few Google searches can confirm, and we can all learn from these mistakes.
+To understand why certain clocks behave in a certain way, we first need to understand what properties different clocks can give us.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_monotonicity&quot;&gt;Monotonicity&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The first property is monotonicity. A monotonically increasing function means that for every subsequent invocation of such a function the produced value is never smaller than any of the previous values. So, a monotonic clock is a clock that never goes backwards. Sadly, and surprisingly, this property is not a feature of many clocks.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_resolution&quot;&gt;Resolution&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Resolution is the second property. It is the smallest observable difference between two clock ticks. The resolution of a simple mechanical watch with a second hand is one second. When you’re staring at the watch, the meaningful watch hand position can be at 12 seconds or 13 seconds, but never 12 and a half.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_latency&quot;&gt;Latency&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Very often latency is overlooked when we’re talking about clocks, but it’s quite important when we’re considering other properties like resolution. For instance, it doesn’t matter if you have the most precise atomic watch on your hand with picosecond resolution ‒ if I ask you what time it is and it takes you roughly a second, sometimes less, sometimes more, to take a look and respond, all of this precision fades away.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So, what properties do Java clocks have, and how do they apply to the questions that we looked at the beginning?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_clocks_on_the_wall&quot;&gt;Clocks on the wall&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Let’s start with &lt;code&gt;System.currentTimeMillis()&lt;/code&gt;. Usually, the best place to start the exploration is the documentation written in the Javadoc, and there is a lot there to take in. Here is an excerpt of what is important to us right now.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/java.base/share/classes/java/lang/System.java#l375&quot;&gt;Javadoc&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;/**
+ * Returns the current time in milliseconds. Note that
+ * while the unit of time of the return value is a millisecond,
+ * the granularity of the value depends on the underlying
+ * operating system and may be larger.  For example, many
+ * operating systems measure time in units of tens of
+ * milliseconds.
+ *
+ * ...
+ *
+ * @return  the difference, measured in milliseconds, between
+ *          the current time and midnight, January 1, 1970 UTC.
+ */
+public static native long currentTimeMillis();&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As we can see, the clock provides us with a millisecond precision value but the actual resolution depends on the operating system. Moreover, if we measure the latency by measuring the execution time, it will be way below 1 millisecond, so it&amp;#8217;s maybe not a surprise that the answer to the &lt;a href=&quot;#aq1&quot;&gt;first question&lt;/a&gt; was yes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;But can it go backwards? The Javadoc doesn’t mention anything about monotonicity, so we need to dig deeper, and take a look at the implementation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock warning&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Warning&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+This article only explores the native implementation for Linux and MacOS. However, similar techniques can be applied to other operating systems as well.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The method is native, so the implementation depends on the underlying OS. The native implementation for Linux and MacOS look almost identical.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1204&quot;&gt;Linux&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;jlong os::javaTimeMillis() {
+  timeval time;
+  int status = gettimeofday(&amp;amp;time, NULL);
+  assert(status != -1, &quot;linux error&quot;);
+  return jlong(time.tv_sec) * 1000  +  jlong(time.tv_usec / 1000);
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/bsd/os_bsd.cpp#l893&quot;&gt;MacOS&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;jlong os::javaTimeMillis() {
+  timeval time;
+  int status = gettimeofday(&amp;amp;time, NULL);
+  assert(status != -1, &quot;bsd error&quot;);
+  return jlong(time.tv_sec) * 1000  +  jlong(time.tv_usec / 1000);
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The functions invoke exactly the same syscall, &lt;code&gt;gettimeofday&lt;/code&gt;. The man page can provide us with more info, but more importantly with some valuable notes:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://man7.org/linux/man-pages/man2/gettimeofday.2.html&quot;&gt;man page&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-man&quot; data-lang=&quot;man&quot;&gt;NAME
+       gettimeofday, settimeofday - get / set time
+
+NOTES
+       The time returned by gettimeofday() is affected by discontinuous
+       jumps in the system time (e.g., if the system administrator manually
+       changes the system time).  If you need a monotonically increasing
+       clock, see clock_gettime(2).&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As noted above, the time is affected by discontinuous jumps in the system time, which could be backwards, hence the clock is not monotonic. The answer to the &lt;a href=&quot;#aq3&quot;&gt;third question&lt;/a&gt; was yes which does make sense: if we change the current time to one hour ago, we still want &lt;code&gt;currentTimeMillis&lt;/code&gt; to return current time, even though the definition of the current time has changed. That’s why it&amp;#8217;s often called wall-clock time, the clock on the wall can also jump back in time if we adjust it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_the_nanos_of_the_current_time&quot;&gt;The nanos of the current time&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The same exploration path can be taken for &lt;code&gt;System.nanoTime()&lt;/code&gt;. Let’s start from the Javadoc which has even more intriguing details than the previous one; here is an excerpt.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/java.base/share/classes/java/lang/System.java#l394&quot;&gt;Javadoc&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;/**
+ * Returns the current value of the running Java Virtual Machine's
+ * high-resolution time source, in nanoseconds.
+ *
+ * This method can only be used to measure elapsed time and is
+ * not related to any other notion of system or wall-clock time.
+ * The value returned represents nanoseconds since some fixed but
+ * arbitrary &amp;lt;i&amp;gt;origin&amp;lt;/i&amp;gt; time (perhaps in the future, so values
+ * may be negative) ...
+ *
+ * &amp;lt;p&amp;gt;This method provides nanosecond precision, but not necessarily
+ * nanosecond resolution ...
+ *
+ * &amp;lt;p&amp;gt;The values returned by this method become meaningful only when
+ * the difference between two such values, obtained within the same
+ * instance of a Java virtual machine, is computed.
+ *
+ * ...
+ */
+public static native long nanoTime();&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Apparently, the time returned by this clock isn’t related to any real-world time; it can only be used to compare the timestamps within the same JVM instance, and it’s relative to an arbitrary “origin” which can be in the future, and therefore it might be negative – which answers the &lt;a href=&quot;#aq3&quot;&gt;sixth question&lt;/a&gt;. Similar to &lt;code&gt;currentTimeMillis&lt;/code&gt;, this method provides nanosecond precision, but not necessarily nanosecond resolution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Nano time can only be used to measure time intervals, so it ought to be monotonic, right? Unfortunately, the Javadoc doesn’t say anything about monotonicity, so the next step is the implementation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1301&quot;&gt;Linux&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;jlong os::javaTimeNanos() {
+  if (os::supports_monotonic_clock()) {
+    struct timespec tp;
+    int status = Linux::clock_gettime(CLOCK_MONOTONIC, &amp;amp;tp);
+    assert(status == 0, &quot;gettime error&quot;);
+    jlong result = jlong(tp.tv_sec) * (1000 * 1000 * 1000) + jlong(tp.tv_nsec);
+    return result;
+  } else {
+    timeval time;
+    int status = gettimeofday(&amp;amp;time, NULL);
+    assert(status != -1, &quot;linux error&quot;);
+    jlong usecs = jlong(time.tv_sec) * (1000 * 1000) + jlong(time.tv_usec);
+    return 1000 * usecs;
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here comes the first surprise: nano time is indeed monotonic but &lt;strong&gt;only&lt;/strong&gt; if the underlying operating system supports it. To be fair, any modern Linux server supports &lt;code&gt;CLOCK_MONOTONIC&lt;/code&gt;; there are, however, some &lt;a href=&quot;https://stackoverflow.com/a/51345008/1542319&quot;&gt;rare situations&lt;/a&gt; in which it might not hold true.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/bsd/os_bsd.cpp#l893&quot;&gt;MacOS&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;jlong os::javaTimeNanos() {
+  const uint64_t tm = mach_absolute_time();
+  const uint64_t now = (tm * Bsd::_timebase_info.numer) / Bsd::_timebase_info.denom;
+  const uint64_t prev = Bsd::_max_abstime;
+  if (now &amp;lt;= prev) {
+    return prev;   // same or retrograde time;
+  }
+  const uint64_t obsv = Atomic::cmpxchg(now, &amp;amp;Bsd::_max_abstime, prev);
+  assert(obsv &amp;gt;= prev, &quot;invariant&quot;);   // Monotonicity
+  // If the CAS succeeded then we're done and return &quot;now&quot;.
+  // If the CAS failed and the observed value &quot;obsv&quot; is &amp;gt;= now then
+  // we should return &quot;obsv&quot;.  If the CAS failed and now &amp;gt; obsv &amp;gt; prv then
+  // some other thread raced this thread and installed a new value, in which case
+  // we could either (a) retry the entire operation, (b) retry trying to install now
+  // or (c) just return obsv.  We use (c).   No loop is required although in some cases
+  // we might discard a higher &quot;now&quot; value in deference to a slightly lower but freshly
+  // installed obsv value.   That's entirely benign -- it admits no new orderings compared
+  // to (a) or (b) -- and greatly reduces coherence traffic.
+  // We might also condition (c) on the magnitude of the delta between obsv and now.
+  // Avoiding excessive CAS operations to hot RW locations is critical.
+  // See https://blogs.oracle.com/dave/entry/cas_and_cache_trivia_invalidate
+  return (prev == obsv) ? now : obsv;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The first thing that stands out is the giant wall of comments. As software engineers, we know that if there is a long comment then something dodgy must be going on. Indeed, the comment is quite interesting. The call to &lt;a href=&quot;https://opensource.apple.com/source/Libc/Libc-320.1.3/i386/mach/mach_absolute_time.c.auto.html&quot;&gt;&lt;code&gt;mach_absolute_time&lt;/code&gt;&lt;/a&gt; uses the &lt;a href=&quot;https://en.wikipedia.org/wiki/Time_Stamp_Counter&quot;&gt;RDTSC&lt;/a&gt; instruction underneath which can &lt;strong&gt;potentially&lt;/strong&gt; lead to non-monotonic behaviour on machines with multiple CPU sockets, which recently span up another thought-provoking discussion on the &lt;a href=&quot;https://groups.google.com/forum/#!topic/mechanical-sympathy/7WnH37dA6Yc&quot;&gt;mechanical sympathy&lt;/a&gt; mailing list.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So, at least, we can be confident that nano time is always monotonic on MacOS, right? Actually, it depends on the JVM version. The code listed above was introduced in JDK9 in &lt;a href=&quot;https://bugs.openjdk.java.net/browse/JDK-8040140&quot;&gt;JDK-8040140&lt;/a&gt; and backported to JDK8. Before, all you could hope for was non-monotonic time which provided at best microsecond resolution because &lt;code&gt;gettimeofday&lt;/code&gt; was used. If we run some &lt;a href=&quot;https://shipilev.net/blog/2014/nanotrusting-nanotime/#_latency&quot;&gt;benchmarks&lt;/a&gt;, we&amp;#8217;ll see that the latency for these calls can be as small as 30ns, so suddenly the answer to the &lt;a href=&quot;#aq2&quot;&gt;second&lt;/a&gt; and the &lt;a href=&quot;#aq4&quot;&gt;fourth&lt;/a&gt; questions is true, or rather &quot;it depends&quot;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_when_milliseconds_are_not_enough&quot;&gt;When milliseconds are not enough&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The microsecond precision in the case of &lt;code&gt;gettimeofday&lt;/code&gt; is much more than &lt;code&gt;System.currentTimeMillis()&lt;/code&gt; can give us, but in the process of conversion precision is lost.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;jlong os::javaTimeMillis() {
+  timeval time;
+  int status = gettimeofday(&amp;amp;time, NULL);
+  assert(status != -1, &quot;linux error&quot;);
+  return jlong(time.tv_sec) * 1000  +  jlong(time.tv_usec / 1000);
+                                                      // ^^ precision loss
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The OS can give us additional information which we violently discard in order to fit it into a single long. What if we really want to know these micros? In JDK 8, the new JSR 310 arrived which made it possible to obtain an instance of &lt;code&gt;Instant&lt;/code&gt; class which contains the number of seconds since the epoch and the number of nanoseconds since the last second started.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;https://jcp.org/en/jsr/detail?id=310&quot;&gt;JSR 310: Date and Time API&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;Instant instant = Clock.systemUTC().instant();
+long epochSecond = instant.getEpochSecond();
+int nanoSinceSecond = instant.getNano();&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Finally, all Java developers got access to wall-clock time with high precision, right? Not so fast, if we take a look at the implementation in JDK8, we’ll find out that it simply delegates straight to &lt;code&gt;System.currentTimeMillis()&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/java/time/Clock.java#l469&quot;&gt;JDK8 Clock&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@Override
+public long millis() {
+    return System.currentTimeMillis();
+}
+@Override
+public Instant instant() {
+    return Instant.ofEpochMilli(millis());
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Evidently, this is not optimal and there is a corresponding issue &lt;a href=&quot;https://bugs.openjdk.java.net/browse/JDK-8068730&quot;&gt;JDK-8068730&lt;/a&gt; which has already been resolved and as a result, the precision was increased. It requires an update to JDK9+ where the method delegates to a native call with the following implementation on Linux. Assuming that your OS can provide microsecond resolution, this clock is a great example of a clock with nanosecond precision, but only microsecond resolution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1211&quot;&gt;JDK9+ Clock&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;void os::javaTimeSystemUTC(jlong &amp;amp;seconds, jlong &amp;amp;nanos) {
+  timeval time;
+  int status = gettimeofday(&amp;amp;time, NULL);
+  assert(status != -1, &quot;linux error&quot;);
+  seconds = jlong(time.tv_sec);
+  nanos = jlong(time.tv_usec) * 1000;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_time_exchange&quot;&gt;Time exchange&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The possibility to get the current wall-clock time with microsecond resolution is great, but is needed often? One of the reasons to use wall-clock time is to be able to relate an event that happened on one machine to another event that happened on a different machine, or more precisely, to decide on the order of these events. The events can be very different in nature. Some of them might not be very critical, like the timestamp on a log line, but some of them must be correct, like when there is a conflict in a database due to two values being written concurrently and timestamps are used to determine which event was last. This strategy is called Last Write Wins, or simply LWW.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;canva-embed&quot; data-design-id=&quot;DADZmyL_mRw&quot; data-height-ratio=&quot;0.5625&quot; style=&quot;padding:56.2500% 5px 5px 5px;background:rgba(0,0,0,0.03);border-radius:8px;&quot;&gt;&lt;/div&gt;&lt;script async src=&quot;https:&amp;#x2F;&amp;#x2F;sdk.canva.com&amp;#x2F;v1&amp;#x2F;embed.js&quot;&gt;&lt;/script&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;On the slides above, two clients Alice and Bob are trying to write simultaneously into an eventually consistent webscale database with two nodes. While the first value written by Alice was successfully synchronized,  Alice’s second write happened to be at approximately the same time as Bob’s. In this situation, the database must resolve the conflict so that the data is consistent between all of the nodes. In the case of LWW, the latest write will be chosen by comparing the timestamps of each write. LWW works perfectly if the clocks are perfectly synchronised, however, if the clocks are poorly synchronised and the clock of the first node has drifted ahead of the second node, LWW becomes Lucky Write Wins – the client connected to the lucky node always wins the conflict.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_ntp&quot;&gt;NTP&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The standard approach to make sure that the clocks on different nodes in the cluster are synchronized is to use Network Time Protocol (NTP). Not only does NTP help synchronise clocks, it also helps propagate a leap second flag. Leap second is an occasional event where an additional second is introduced in between 23:59:59 of a chosen day and 00:00:00 of the following day. It’s often implemented as playing the same second twice which from the observer’s point of view might look like a jump 1 second back in time. The last leap second was introduced on the 31st of December 2016 which resulted in the above-mentioned DNS incident.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/time/time_2.png&quot; alt=&quot;time 2&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The conventional way of dealing with leap seconds is &quot;leap smearing&quot;. The NTP server which is responsible for leap smearing can distribute the additional second amongst 12 hours before and 12 hours after the second is introduced. The wall-clock time during these 24 hours is ticking slower and every second is 1/86400 longer which might be surprising, however less surprising than a jump back in time. The catch is that not many NTP servers support leap smearing, the public NTP servers most definitely don’t.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The major cloud providers, &lt;a href=&quot;https://developers.google.com/time/smear&quot;&gt;Google&lt;/a&gt; and &lt;a href=&quot;https://aws.amazon.com/blogs/aws/look-before-you-leap-the-coming-leap-second-and-aws/&quot;&gt;AWS&lt;/a&gt; both provide NTP services with leap smearing support. If your application is hosted on a platform that provides an NTP service and you care about clock synchronisation it’s worthwhile checking that NTP synchronisation is set up with the provider’s NTP service. Not only can it help avoid the nasty consequences of applying leap seconds naïvely, but it also dramatically decreases the synchronisation error since the network latency is typically much lower within a single datacenter.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;AWS NTP with chrony&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;sergey:~$ chronyc sources -v
+210 Number of sources = 9
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
+| /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+===============================================================================
+^* 169.254.169.123               3  10   377   433    -25us[  -36us] +/-  356us&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Using a local NTP server can reduce the clock drift down to milliseconds or even microseconds in the best case, but what is the worst case? There is not much research on this topic, however some notable results were mentioned in the Google Spanner paper.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;blockquote&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Between synchronizations, a daemon advertises a slowly increasing time uncertainty. ε is derived from conservatively applied worst-case local clock drift. ε also depends on time-master uncertainty and communication delay to the time masters. In our production environment, ε is typically a sawtooth function of time, varying from about 1 to 7 ms over each poll interval. ε̅ is therefore 4 ms most of the time. The daemon’s poll interval is currently 30 seconds, and the current applied drift rate is set at 200 microseconds/second, which together accounts for the sawtooth bounds from 0 to 6 ms.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;div class=&quot;attribution&quot;&gt;
+&amp;#8212; Spanner: Google’s Globally-Distributed Database
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_logical_conclusion&quot;&gt;Logical conclusion&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Even if the monitoring in our cluster shows that the clocks are synchronised with microsecond precision, we need to be cautious and shouldn’t rely on this in our software if a failure of this assumption is unacceptable. So, if a failure is unacceptable and we need to know the order of the events in a distributed system, is there anything we can do? As always, there is a number of solutions suggested by academia.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_lamport_clocks&quot;&gt;Lamport clocks&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;What we need is a reliable replacement for our system clocks, so that for every two events &lt;em&gt;A&lt;/em&gt; and &lt;em&gt;B&lt;/em&gt; we can say that either &lt;em&gt;A&lt;/em&gt; happened before &lt;em&gt;B&lt;/em&gt;, or &lt;em&gt;B&lt;/em&gt; happened before &lt;em&gt;A&lt;/em&gt;. Such order between events is called total order. In the &lt;a href=&quot;https://lamport.azurewebsites.net/pubs/time-clocks.pdf&quot;&gt;&quot;Time, Clocks, and the Ordering of Events in a Distributed System&quot;&lt;/a&gt; paper Leslie Lamport described the &quot;happens before&quot; relation and logical clocks that can be used to define total order for a set of events using the following algorithm.&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Sending a message&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Receiving a message&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;time = time + 1;
+send(message, time);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;(message, ts) = receive();
+time = max(ts, time) + 1;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Every actor, in this case, Alice and Bob, will maintain a shared view of the current time by maintaining a &lt;code&gt;time&lt;/code&gt; counter which increases every time a message is sent, and when a message is received, the &lt;code&gt;time&lt;/code&gt; is always bigger than the last observed counter. That way if Alice updates the Database as shown below with the value 2 and tells Bob about the last known state, Bob&amp;#8217;s final write carries with it the knowledge of seeing Alice’s counter, so it’s chosen as the final state of the database.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+On the slides below Alice tells Bob the value which she wrote to the first node. Alternatively, Bob could have read the same value from the first node and it would lead to the same result – Alice and Bob don&amp;#8217;t have to communicate directly.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;canva-embed&quot; data-design-id=&quot;DADZnGWHlAU&quot; data-height-ratio=&quot;0.5625&quot; style=&quot;padding:56.2500% 5px 5px 5px;background:rgba(0,0,0,0.03);border-radius:8px;&quot;&gt;&lt;/div&gt;&lt;script async src=&quot;https:&amp;#x2F;&amp;#x2F;sdk.canva.com&amp;#x2F;v1&amp;#x2F;embed.js&quot;&gt;&lt;/script&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This works perfectly as long as we need to define some total order of the events in the system which captures the causality. It&amp;#8217;s important to note that having total order means that concurrent events will be ordered in some way, not necessarily the most logical way. On the slides below, Alice never talked to Bob, but her counter is bigger which leads to her write being chosen in the case of a conflict.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;canva-embed&quot; data-design-id=&quot;DADZnC8PNnM&quot; data-height-ratio=&quot;0.5625&quot; style=&quot;padding:56.2500% 5px 5px 5px;background:rgba(0,0,0,0.03);border-radius:8px;&quot;&gt;&lt;/div&gt;&lt;script async src=&quot;https:&amp;#x2F;&amp;#x2F;sdk.canva.com&amp;#x2F;v1&amp;#x2F;embed.js&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_vector_clocks&quot;&gt;Vector clocks&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To deal with truly concurrent events, we need a new definition or order which is able to express the situation in which events can happen concurrently. Such order is called partial order. Basically, this means that for any two events &lt;em&gt;A&lt;/em&gt; and &lt;em&gt;B&lt;/em&gt;, it&amp;#8217;s possible to say whether &lt;em&gt;A&lt;/em&gt; happened before &lt;em&gt;B&lt;/em&gt;, &lt;em&gt;B&lt;/em&gt; happened before &lt;em&gt;A&lt;/em&gt; or &lt;em&gt;A&lt;/em&gt; and &lt;em&gt;B&lt;/em&gt; happened concurrently. To determine partial order the following algorithm can be used this, where every actor has a separate time counter, and keeps track of the latest timestamp of any other actor in the system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Sending a message&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Receiving a message&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;V[myId] = V[myId] + 1
+send(message, V);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;(message, Vr) = receive();
+for (i, v) in Vr {
+    V[i] = max(V[i], v);
+}
+V[myId] = V[myId] + 1;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The algorithm was described in 1988, and later using vector clocks for conflict resolution in a database was described in the Dynamo paper. On the following slides, Alice keeps track of her own time counter as well as Bob&amp;#8217;s last known time counter. That way when Alice sends a message to Bob, he updates his counters and the next message sent to the database is chosen during the conflict resolution because each component of Bob’s time vector is larger than the respective component of the previous vector.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;canva-embed&quot; data-design-id=&quot;DADZnKp0nOE&quot; data-height-ratio=&quot;0.5625&quot; style=&quot;padding:56.2500% 5px 5px 5px;background:rgba(0,0,0,0.03);border-radius:8px;&quot;&gt;&lt;/div&gt;&lt;script async src=&quot;https:&amp;#x2F;&amp;#x2F;sdk.canva.com&amp;#x2F;v1&amp;#x2F;embed.js&quot;&gt;&lt;/script&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When there is a real conflict, vector clocks can help to determine whether the events were truly concurrent. In the scenario below, two nodes end up with the events, &lt;code&gt;[0, 1]&lt;/code&gt; and &lt;code&gt;[0, 1]&lt;/code&gt; which cannot be ordered. In this situation, the database can keep both values, and return them the next time it is read, to let either Alice or Bob decide which one to keep so that the data is not lost.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;canva-embed&quot; data-design-id=&quot;DADZnBQkwxE&quot; data-height-ratio=&quot;0.5625&quot; style=&quot;padding:56.2500% 5px 5px 5px;background:rgba(0,0,0,0.03);border-radius:8px;&quot;&gt;&lt;/div&gt;&lt;script async src=&quot;https:&amp;#x2F;&amp;#x2F;sdk.canva.com&amp;#x2F;v1&amp;#x2F;embed.js&quot;&gt;&lt;/script&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;These properties, however, do not come for free. The metadata needs to be exchanged with every message, and multiple versions need to be stored. After all, some databases, like Cassandra don&amp;#8217;t use vector clocks &lt;a href=&quot;https://www.datastax.com/dev/blog/why-cassandra-doesnt-need-vector-clocks&quot;&gt;for a reason&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;code&gt;System.nanoTime()&lt;/code&gt; for measuring time intervals&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;code&gt;System.currentTimeMillis()&lt;/code&gt; for obtaining wall-clock time&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;code&gt;Clock.systemUTC().instant()&lt;/code&gt; for getting wall-clock time with ns &lt;em&gt;precision&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Not every clock can give you the resolution you want even if its precision is high&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The wall-clock time can be off by dozens of milliseconds (or more, or less)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use NTP from your cloud provider if time synchronisation matters&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Logical clocks might be more appropriate than the real clocks but they have associated costs&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_thanks&quot;&gt;Thanks&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You for reading this article&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Uri Baghin for reviewing the article&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Are you as passionate about distributed systems as me and my colleagues at Canva are? &lt;a href=&quot;https://www.canva.com/careers/jobs/senior-software-engineer-java-apis-gateways/?cp=sercemej&quot;&gt;Join us&lt;/a&gt;, we are growing our &lt;a href=&quot;https://www.canva.com/careers/jobs/senior-software-engineer-java-apis-gateways/?cp=sercemeg&quot;&gt;API Gateway&lt;/a&gt; team to take on a big new project!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_share_this_article&quot;&gt;Share this article&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;TODO:&lt;/p&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just wrote a new &lt;a href=&quot;https://twitter.com/hashtag/kotlin?src=hash&quot;&gt;#kotlin&lt;/a&gt; blog post! &amp;quot;Fantastic DSLs and where to find them&amp;quot; &lt;a href=&quot;https://t.co/T9z5lFE45K&quot;&gt;https://t.co/T9z5lFE45K&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/880365305314254848&quot;&gt;June 29, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&quot;//platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;hr&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_references&quot;&gt;References&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://shipilev.net/blog/2014/nanotrusting-nanotime/&quot;&gt;Nanotrusting the Nanotime&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.usenix.org/system/files/conference/osdi12/osdi12-final-16.pdf&quot;&gt;Spanner: Google’s Globally-Distributed Database&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html&quot;&gt;AWS NTP&lt;/a&gt; / &lt;a href=&quot;https://developers.google.com/time/&quot;&gt;Google NTP&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=un1AHZBgFfk&quot;&gt;Video PWLSF - Bryan Fink on &quot;A Brief History of NTP Time: Memoirs of an Internet Timekeeper&quot;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://ieeexplore.ieee.org/abstract/document/103043/&quot;&gt;Internet time synchronization: the network time protocol&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://blog.cloudflare.com/how-and-why-theleap-second-affected-cloudflare-dns/&quot;&gt;How and why the leap second affected Cloudflare DNS&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://aphyr.com/posts/299-the-trouble-with-timestamps&quot;&gt;The trouble with timestamps&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://lamport.azurewebsites.net/pubs/time-clocks.pdf&quot;&gt;Time, Clocks, and the Ordering of Events in a Distributed System&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://zoo.cs.yale.edu/classes/cs426/2012/lab/bib/fidge88timestamps.pdf&quot;&gt;Timestamps in Message-Passing Systems That Preserve the Partial Ordering&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://blog.rapid7.com/2014/03/14/synchronizing-clocksin-a-cassandra-cluster-pt-1-the-problem/&quot;&gt;Synchronizing Clocks In a Cassandra Cluster&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.datastax.com/dev/blog/why-cassandra-doesnt-need-vector-clocks&quot;&gt;Why Cassandra doesn’t need vector clocks&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.allthingsdistributed.com/files/amazondynamo-sosp2007.pdf&quot;&gt;Dynamo: Amazon’s Highly Available Key-value Store&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://basho.com/posts/technical/why-vector-clocks-are-easy/&quot;&gt;Why Vector Clocks Are Easy&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://basho.com/posts/technical/why-vector-clocks-are-hard/&quot;&gt;Why Vector Clocks Are Hard&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+<enclosure>
+
+</enclosure>
+<pubDate>
+Thu, 16 May 2019 00:00:00 +1000
+</pubDate>
+</item>
 <item>
 <guid>
 http://serce.me/posts/29-06-2017-fantastic-dsls/
