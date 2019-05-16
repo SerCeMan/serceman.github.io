@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Thu, 16 May 2019 19:50:31 +1000
+Thu, 16 May 2019 20:00:57 +1000
 </lastBuildDate>
 <generator>
 clj-rss
@@ -703,12 +703,8 @@ V[myId] = V[myId] + 1;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_share_this_article&quot;&gt;Share this article&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;TODO:&lt;/p&gt;
-&lt;/div&gt;
 &lt;hr&gt;
-&lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just wrote a new &lt;a href=&quot;https://twitter.com/hashtag/kotlin?src=hash&quot;&gt;#kotlin&lt;/a&gt; blog post! &amp;quot;Fantastic DSLs and where to find them&amp;quot; &lt;a href=&quot;https://t.co/T9z5lFE45K&quot;&gt;https://t.co/T9z5lFE45K&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/880365305314254848&quot;&gt;June 29, 2017&lt;/a&gt;&lt;/blockquote&gt;
-&lt;script async src=&quot;//platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just published a new blog post &amp;quot;The matter of time()&amp;quot;. JVM, clocks, and mysterious time in distributed systems. It&amp;#39;s just about time! &lt;a href=&quot;https://t.co/r11FtwZh02&quot;&gt;https://t.co/r11FtwZh02&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1128963307753287680?ref_src=twsrc%5Etfw&quot;&gt;May 16, 2019&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
 &lt;hr&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
