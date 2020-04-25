@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Thu, 16 May 2019 20:00:57 +1000
+Sat, 25 Apr 2020 15:16:59 +1000
 </lastBuildDate>
 <generator>
 clj-rss
@@ -2074,8 +2074,8 @@ how to increase the performance of your Java program using a pure inline assembl
 &lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
 &lt;/td&gt;
 &lt;td class=&quot;content&quot;&gt;
-This article is written mostly about something that can never be released&lt;br&gt;
-About API that can never be seen&lt;br&gt;
+This article is written mostly about something that may never be released&lt;br&gt;
+About API that may never be seen&lt;br&gt;
 About code you shouldn&amp;#8217;t use in production&lt;br&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
