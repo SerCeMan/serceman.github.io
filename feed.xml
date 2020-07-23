@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Thu, 23 Jul 2020 20:10:54 +1000
+Thu, 23 Jul 2020 20:12:17 +1000
 </lastBuildDate>
 <generator>
 clj-rss
@@ -162,8 +162,7 @@ You don't need no Service Mesh
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_share_this_article&quot;&gt;Share this article&lt;/h3&gt;
 &lt;hr&gt;
-&lt;blockquote class=&quot;twitter-tweet&quot; style=&quot;vertical-align: middle&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just published a new blog post &amp;quot;The matter of time()&amp;quot;. JVM, clocks, and mysterious time in distributed systems. It&amp;#39;s just about time! &lt;a href=&quot;https://t.co/r11FtwZh02&quot;&gt;https://t.co/r11FtwZh02&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1128963307753287680?ref_src=twsrc%5Etfw&quot;&gt;May 16, 2019&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
-&lt;hr&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;&amp;quot;You don&amp;#39;t need no Service Mesh&amp;quot;. Just published a new blog post with an anti-hype opinion on the over-hyped topic. &lt;a href=&quot;https://t.co/SVXS3nWKzj&quot;&gt;https://t.co/SVXS3nWKzj&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1286242507664191488?ref_src=twsrc%5Etfw&quot;&gt;July 23, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_references&quot;&gt;References&lt;/h3&gt;
