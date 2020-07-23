@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Thu, 23 Jul 2020 20:01:43 +1000
+Thu, 23 Jul 2020 20:10:54 +1000
 </lastBuildDate>
 <generator>
 clj-rss
@@ -136,7 +136,6 @@ You don't need no Service Mesh
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;The point 1. is important when for whatever reason you can’t redeploy your services very often, e.g. maybe no one remembers how it’s done anymore, or maybe there are other restrictions. The point 2. is important when your stack is heterogeneous, e.g. some services are built in Go, some in Java, some in Haskell, etc. Where are you on the interval from a huge set of heterogeneous services with unknown deployment schedules to a set of homogenous regularly deployed services defines whether a service mesh is the best solution for you.&lt;/p&gt;
 &lt;/div&gt;
-&lt;blockquote class=&quot;twitter-tweet tw-align-center&quot; data-dnt=&quot;true&quot; data-theme=&quot;light&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Service mesh =&amp;gt; &lt;a href=&quot;https://t.co/mDWwODiFUW&quot;&gt;https://t.co/mDWwODiFUW&lt;/a&gt; &lt;a href=&quot;https://t.co/kv13j090fU&quot;&gt;pic.twitter.com/kv13j090fU&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sebastian Caceres (@sebiwicb) &lt;a href=&quot;https://twitter.com/sebiwicb/status/962963928484630530?ref_src=twsrc%5Etfw&quot;&gt;February 12, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_conclusion&quot;&gt;Conclusion&lt;/h3&gt;
