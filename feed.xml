@@ -12,11 +12,193 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Sat, 25 Apr 2020 15:16:59 +1000
+Thu, 23 Jul 2020 20:01:43 +1000
 </lastBuildDate>
 <generator>
 clj-rss
 </generator>
+<item>
+<guid>
+http://serce.me/posts/23-07-2020-you-dont-need-no-service-mesh/
+</guid>
+<link>
+http://serce.me/posts/23-07-2020-you-dont-need-no-service-mesh/
+</link>
+<title>
+You don't need no Service Mesh
+</title>
+<description>
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Hi!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Service meshes have attracted an enormous amount of hype around them. With at least a few talks about service meshes during each tech conference, one can easily be convinced that having a service mesh in their infrastructure is a must. However, hype isn’t a good indicator of whether the new shiny tech is the right solution for your problems. So below, I’ll try to express an anti-hype opinion on service meshes to hopefully make it less confusing when you want to decide whether you may or may not need one.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/servicemesh/rick.png&quot; alt=&quot;rick&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;blockquote&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There&amp;#8217;s a lesson here, and I&amp;#8217;m not going to be the one to figure it out.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;div class=&quot;attribution&quot;&gt;
+&amp;#8212; Rick Sanchez
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_the_invention&quot;&gt;The invention&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Let’s take a step back in history and take a look at one of the &lt;a href=&quot;https://eng.lyft.com/envoy-7-months-later-41986c2fd443&quot;&gt;early articles&lt;/a&gt; about introducing Envoy at Lyft.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;blockquote&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As it turns out, almost every company with a moderately-sized service oriented architecture is having the same problems that Lyft did prior to the development and deployment of Envoy:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;An architecture composed of a variety of languages, each containing a half-baked RPC library, including partial (or zero) implementations of rate limiting, circuit breaking, timeouts, retries, etc.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Differing or partial implementations of stats, logging, and ….&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While Envoy is not a service mesh by itself, the outlined problems describe the exact reason why service meshes were invented. They add “rate limiting, circuit breaking, …” and other reliability, observability, and security features to the services by enforcing the communication to go through the service mesh proxies, a data plane. Additionally, they require a separate component, a control plane, to control the configuration.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;However, at this point, a lot of people miss the context in which service meshes were introduced. Service meshes are able to solve the problem not because it’s impossible to solve them in any other way. There are many battle-proof RPC libraries that take on the challenges of a separate data plane layer, &lt;a href=&quot;https://github.com/twitter/finagle&quot;&gt;Finagle&lt;/a&gt;, &lt;a href=&quot;https://github.com/grpc&quot;&gt;gRPC&lt;/a&gt;, &lt;a href=&quot;https://github.com/line/armeria&quot;&gt;Armeria&lt;/a&gt;, &lt;a href=&quot;https://github.com/apple/servicetalk&quot;&gt;Servicetalk&lt;/a&gt;, to name a few. After all, the very first service mesh - Linkerd 1.0 &lt;a href=&quot;https://github.com/linkerd/linkerd&quot;&gt;is powered by Finagle&lt;/a&gt;. The RPC libraries will need a component which provides service discovery and configuration management to make it a true mesh. For instance, Zookeeper, or Consul, a component that service meshes call a control plane.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Why introduce a new concept to solve the problems that have been solved before? The service mesh concept wasn’t introduced to address problems that hadn’t been addressed before but rather address them in a way that doesn’t require any modifications to the application code, which is incredibly convenient when it’s hard to introduce an RPC layer into an existing heterogeneous microservice environment.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When you hear service mesh, Istio with Envoy might be the first thing that comes to mind, but it wasn’t the first service mesh to enter the market. Linkerd authors who pioneered the space, described exactly this situation in the &lt;a href=&quot;https://linkerd.io/2017/04/25/whats-a-service-mesh-and-why-do-i-need-one/#why-is-the-service-mesh-necessary&quot;&gt;&quot;why is the service mesh necessary&quot;&lt;/a&gt;. Interestingly, in many hype-y articles on the Internet this context is often forgotten, or omitted.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Solving a problem well, even if it’s a problem that a lot of people have, doesn’t magically provide the tech with a lot of hype. There is always a sponsor behind it. I don’t know who the sponsor was here, and I’m going to speculate, but it’s hard to sell an RPC library in the world where open source is a fundamental requirement. There is no clear business model there, that’s why most of the mature RPC libraries were open-sourced by large tech companies for which it’s not a part of the core business model. A library is just code, not a piece of infrastructure. Service meshes are a different story. It’s an isolated non-trivial piece of infrastructure. As a vendor, not only can you provide consultancy around the configuration and deployment, but you can also sell complete hosted solutions around it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_disillusionments&quot;&gt;Disillusionments&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that we’ve established the problems, the solution, and most importantly, the context in which the solution was made, let’s take a look at the alternatives. The most obvious one, in the spirit of KISS, is to use an RPC library for your preferred language. Here is where the context is crucial: if you have a large fleet of services, each written in its own language/ecosystem, and the only language that they share is HTTP then having a single shared RPC library is going to be hard. Perhaps, you’ve got a fabric of deployed and running services, but everyone is afraid of touching them, no one knows how they work, and each redeploy is an adventure. A service mesh is here to help you, because at least you’ll be able to roll out new infrastructure features to the mesh regularly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;On the other hand, if you have a fleet of healthy services written in a single application stack, then it’s a good idea to think twice before introducing a service mesh. By simply introducing or evolving a shared RPC library, you’ll get the exact same benefits and avoid dealing with the downsides of maintaining service meshes. By studying the service mesh limitations thoroughly, you can avoid finding yourself in the trough of disillusionment.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/servicemesh/curve.png&quot; alt=&quot;Hype Cycle&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_different_ecosystem&quot;&gt;Different ecosystem&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The ecosystem of the service mesh of your choice will likely be different from the ecosystem of your services. Beautiful websites always make you believe that the solution is plug&amp;#8217;n&amp;#8217;play, always works and never goes down. In reality, sooner or later problems, bugs, quirks in behaviour will reveal themselves, as they always do. At that point, you’ll need to have engineers who work on the service-mesh’s ecosystem which when it’s different from the main app, effectively limits the set of people who can introduce changes or fix problems. This is likely to reintroduce silos, which is against the whole DevOps spirit. Yes, having a DevOps team of engineers who are doing DevOps-y things &lt;a href=&quot;https://continuousdelivery.com/2012/10/theres-no-such-thing-as-a-devops-team/&quot;&gt;is against DevOps&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_unnecessary_overhead&quot;&gt;Unnecessary overhead&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Not only having a proxy in front of each service adds overhead (often significant, talking about &lt;a href=&quot;https://istio.io/latest/docs/ops/deployment/performance-and-scalability/&quot;&gt;90pt&lt;/a&gt; rather than 99pt in the performance summary &lt;a href=&quot;https://www.infoq.com/presentations/latency-response-time/&quot;&gt;doesn’t make software run faster&lt;/a&gt;) and consumes resources, but you also requires time (or rather a team of people) to manage them. Yes, it can help to make some of the tasks potentially easier - yay, you can now add canary deployments with a few lines of YAML to simple applications now. However, you still need to manage canary deployments of the proxies themselves which don’t have a proxy in front of them. The problems just get pushed up the stack.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_limiting_your_architecture_to_what_the_proxy_supports&quot;&gt;Limiting your architecture to what The Proxy supports.&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As you’re reading this paragraph, HTTP/3 is slowly being rolled out to the Internet. It uses UDP as transport. Why use UDP rather than create a completely new protocol you ask? That’s because anything but TCP and UDP is simply “blocked” by the boxes, various proxies on the internet - routers, gateways, etc. This phenomenon got named &lt;a href=&quot;https://http3-explained.haxx.se/en/why-quic/why-ossification&quot;&gt;ossification&lt;/a&gt;. So, only TCP or UDP are left is the practical chose, and even UDP is partially blocked by various corporate proxies which slows down the adoption.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Even though your microservice environment is probably much smaller compared to the Internet, you can draw parallels with service meshes. Proxies can ossify your application architecture by limiting how your services talk to each other, and there is not much benefit in having proxies if you can bypass them. Suppose you want to build a reactive application which is using RSocket over pure tcp? Or perhaps a message-driven application using an actor model? Or maybe push the performance boundaries with Aeron? Not going to happen until the box in the middle becomes aware of the protocol.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_do_i_need_one&quot;&gt;Do I need one?&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;What does it all mean for you as an engineer? The answer to whether you need to adopt the service mesh approach comes down to the state of the microservice environment you’re trying to improve. As we have established, compared to an RPC framework, service meshes allow you to:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;olist arabic&quot;&gt;
+&lt;ol class=&quot;arabic&quot;&gt;
+&lt;li&gt;
+&lt;p&gt;Deploy the infra changes more often than deploying your services.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Introduce infra changes without touching the service code.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The point 1. is important when for whatever reason you can’t redeploy your services very often, e.g. maybe no one remembers how it’s done anymore, or maybe there are other restrictions. The point 2. is important when your stack is heterogeneous, e.g. some services are built in Go, some in Java, some in Haskell, etc. Where are you on the interval from a huge set of heterogeneous services with unknown deployment schedules to a set of homogenous regularly deployed services defines whether a service mesh is the best solution for you.&lt;/p&gt;
+&lt;/div&gt;
+&lt;blockquote class=&quot;twitter-tweet tw-align-center&quot; data-dnt=&quot;true&quot; data-theme=&quot;light&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Service mesh =&amp;gt; &lt;a href=&quot;https://t.co/mDWwODiFUW&quot;&gt;https://t.co/mDWwODiFUW&lt;/a&gt; &lt;a href=&quot;https://t.co/kv13j090fU&quot;&gt;pic.twitter.com/kv13j090fU&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sebastian Caceres (@sebiwicb) &lt;a href=&quot;https://twitter.com/sebiwicb/status/962963928484630530?ref_src=twsrc%5Etfw&quot;&gt;February 12, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Service meshes have a lot of hype around them, and way too much in my opinion. However, before committing to a piece of technology, it’s crucial to understand the problems it solves, and the context in which the solution was made. A service mesh is not an ultimate “good practice” but simply one of the patterns to solve a set of issues, and it&amp;#8217;s quite a heavy one.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Rather than jumping on board, look carefully - the last thing you want is to find out that you have invested in a solution for a problem that you don’t have. Service meshes are an amazing piece of tech solving a whole lot of problems. Not in every case, it is the best solution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_thank_you_to&quot;&gt;Thank you to&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You for reading this article.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://twitter.com/ptuls&quot;&gt;Paul Tune&lt;/a&gt; for reviewing the article.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_share_this_article&quot;&gt;Share this article&lt;/h3&gt;
+&lt;hr&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot; style=&quot;vertical-align: middle&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just published a new blog post &amp;quot;The matter of time()&amp;quot;. JVM, clocks, and mysterious time in distributed systems. It&amp;#39;s just about time! &lt;a href=&quot;https://t.co/r11FtwZh02&quot;&gt;https://t.co/r11FtwZh02&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1128963307753287680?ref_src=twsrc%5Etfw&quot;&gt;May 16, 2019&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;hr&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_references&quot;&gt;References&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://eng.lyft.com/envoy-7-months-later-41986c2fd443&quot; class=&quot;bare&quot;&gt;https://eng.lyft.com/envoy-7-months-later-41986c2fd443&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/linkerd/linkerd/&quot; class=&quot;bare&quot;&gt;https://github.com/linkerd/linkerd/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://servicemesh.io/&quot; class=&quot;bare&quot;&gt;https://servicemesh.io/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://continuousdelivery.com/2012/10/theres-no-such-thing-as-a-devops-team/&quot; class=&quot;bare&quot;&gt;https://continuousdelivery.com/2012/10/theres-no-such-thing-as-a-devops-team/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://http3-explained.haxx.se/en/why-quic/why-ossification&quot; class=&quot;bare&quot;&gt;https://http3-explained.haxx.se/en/why-quic/why-ossification&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://linkerd.io/2017/04/25/whats-a-service-mesh-and-why-do-i-need-one/#why-is-the-service-mesh-necessary&quot; class=&quot;bare&quot;&gt;https://linkerd.io/2017/04/25/whats-a-service-mesh-and-why-do-i-need-one/#why-is-the-service-mesh-necessary&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+<enclosure>
+
+</enclosure>
+<pubDate>
+Thu, 23 Jul 2020 00:00:00 +1000
+</pubDate>
+</item>
 <item>
 <guid>
 http://serce.me/posts/16-05-2019-the-matter-of-time/
@@ -755,6 +937,8 @@ V[myId] = V[myId] + 1;&lt;/code&gt;&lt;/pre&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;script src=&quot;//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js&quot;&gt;&lt;/script&gt;
 &lt;/div&gt;
 </description>
 <enclosure>
