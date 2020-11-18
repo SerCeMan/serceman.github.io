@@ -12,11 +12,693 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Thu, 23 Jul 2020 20:12:17 +1000
+Wed, 18 Nov 2020 20:33:41 +1100
 </lastBuildDate>
 <generator>
 clj-rss
 </generator>
+<item>
+<guid>
+http://serce.me/posts/18-11-2020-allocate-direct/
+</guid>
+<link>
+http://serce.me/posts/18-11-2020-allocate-direct/
+</link>
+<title>
+Indirect Effects  of Allocate Direct
+</title>
+<description>
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Hi, folks!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Every single program allocates memory. Byte buffers are at the core of many essential libraries which power the services the modern internet is built upon. If you&amp;#8217;re building such a library, or even just copying data between different files, chances are you&amp;#8217;ll need to allocate a buffer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In Java, &lt;code&gt;ByteBuffer&lt;/code&gt; is the class that allows you to do so. Once you&amp;#8217;ve decided to allocate a buffer, you&amp;#8217;ll be presented with two methods &lt;code&gt;allocate()&lt;/code&gt; and &lt;code&gt;allocateDirect()&lt;/code&gt;. Which one to use? The answer is, as always, it depends. If there were no tradeoffs, there wouldn&amp;#8217;t be two methods. In this article, I&amp;#8217;ll explore some of these tradeoffs, demystify this behaviour, and I hope that the answer will be clear for you by the end of it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/allocatedirect/itsgone.png&quot; alt=&quot;itsgone&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;quoteblock text-center&quot;&gt;
+&lt;blockquote&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Yeah well, sometimes the things we do don’t matter right now. Sometimes they matter later. We have to care more about later sometimes, you know.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;div class=&quot;attribution&quot;&gt;
+&amp;#8212; Stan Marsh
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_two_buffers&quot;&gt;Two buffers&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At first glance, the two methods &lt;code&gt;allocate()&lt;/code&gt; and &lt;code&gt;allocateDirect()&lt;/code&gt; are very simple. The &lt;code&gt;allocate()&lt;/code&gt; allocates a buffer in the managed heap of the Java process, a part of this exact space which size is specified with the &lt;code&gt;Xmx&lt;/code&gt; option. The &lt;code&gt;allocateDirect()&lt;/code&gt; method allocates a buffer residing outside of the managed heap.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/allocatedirect/server3.png&quot; alt=&quot;server3&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This difference, however, creates a number of significant runtime implications, which I&amp;#8217;m going to dive into here. But first, let me start by telling a debugging story where direct byte buffers were the murderer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_the_story&quot;&gt;The story&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Every story needs a protagonist. In this case, the protagonist was a Java application built on top of RSocket, a modern application protocol. Here&amp;#8217;s the oversimplified version of the app which you can find on &lt;a href=&quot;https://github.com/SerCeMan/allocatedirect/blob/master/src/main/java/me/serce/allocatedirect/Main.java&quot;&gt;Github&lt;/a&gt;. Let&amp;#8217;s call this app an echo app. The echo code isn&amp;#8217;t trying to do anything complicated, it is a simple echo service built with an awesome &lt;a href=&quot;https://github.com/rsocket/rsocket-java&quot;&gt;rsocket-java&lt;/a&gt; library. All it does is spins up a client and a server, where the client sends messages, and the server echoes them back.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;var server = RSocketServer.create(echo) //...
+var client = RSocketConnector.create() //...
+while (true) {
+  assert Objects.equals(client.send(), client.receive())
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+The supporting code for this article is available &lt;a href=&quot;https://github.com/SerCeMan/allocatedirect&quot;&gt;on Github&lt;/a&gt;. You can, and I highly encourage you to, choose to go through each step yourself by cloning the code and running each example with a simple bash script. All measurements were taken on an EC2 AWS &lt;a href=&quot;https://aws.amazon.com/ec2/instance-types/m5/&quot;&gt;m5.large&lt;/a&gt; instance. Unless specified otherwise, &lt;em&gt;Java 13&lt;/em&gt; is used. The point of this article is not to show the numbers but rather demonstrate the techniques that you can use to debug your own application.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The code is useless if it&amp;#8217;s just sitting in the repo and doing nothing, so let&amp;#8217;s clone the repo and start the app.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;git clone https://github.com/SerCeMan/allocatedirect.git
+cd allocatedirect &amp;amp;&amp;amp; ./start.sh&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The app starts, and you should see that the logs are flowing. As expected, now it&amp;#8217;s processing a large number of messages. However, if the echo app was exposed to users, they would start noticing significant pauses every now and then. All Java developers know that the first thing to look at in the case of spurious pauses is GC.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+You can find GC logs of the app are stored in &lt;code&gt;/tmp/${gcname}&lt;/code&gt;. The example logs for each run are also available in the &lt;a href=&quot;https://github.com/SerCeMan/allocatedirect/tree/master/logs&quot;&gt;repo&lt;/a&gt;. In this article, gceasy.io was used for visualisation. It&amp;#8217;s a great free online tool which supports the log format of multiple garbage collectors. Even though you can always visualise GC logs using a tool like gceasy, as we&amp;#8217;ll see later, the raw logs often contain a lot more information than most of the tools can display.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Indeed, GC logs show that GC is to blame here. The application is running under G1, which is the default collector since JDK 9. There are multiple young GC pauses on the graph. Young GC is a stop-the-world pause in GC in G1. The application stops completely to perform a cleanup. For the echo server, the graph shows multiple young GC pauses that last for 100-130ms and occur every 10 seconds.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;G1 GC&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/allocatedirect/g1before.png&quot; alt=&quot;g1before&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Luckily for us, in the last few years, there has been an amazing development in the GC space. There are not just one but two new fully concurrent garbage collectors, &lt;a href=&quot;https://wiki.openjdk.java.net/display/zgc/Main&quot;&gt;ZGC&lt;/a&gt; and &lt;a href=&quot;https://wiki.openjdk.java.net/display/shenandoah/Main&quot;&gt;Shenandoah&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While I&amp;#8217;ve had &lt;a href=&quot;https://twitter.com/SerCeMan/status/1246676501925224449&quot;&gt;great success&lt;/a&gt; with ZGC before, Shenandoah has a great advantage of being much friendlier to application memory consumption. Many applications, especially simple JSON in, JSON out stateless services are not memory-constrained. Some application, on the other hand, especially the ones that process a large number of connections might be very sensitive to memory usage.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Even though the echo app only has a single client and a server in its current state, it could as well handle tens of thousands of connections. It&amp;#8217;s time to enable Shenandoah,  and run the echo app again.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;./start.sh shen # starts with -XX:+UseShenandoahGC&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;After enabling Shenandoah, the GC logs start showing an interesting picture. There is definitely a huge improvement in the pause frequency. The pauses now only occur every minute or so. However, the pauses are still around 90ms long, which is far away from the desired sub-millisecond pauses.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Shenandoah GC&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/allocatedirect/shenandoah.png&quot; alt=&quot;shenandoah&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that the symptoms are clear, and the problem is reproducible, it&amp;#8217;s time to look at the cause. GC graphs don&amp;#8217;t show much more information. Looking at the raw logs directly, on the other hand, reveals the cause which is clearly stated right on the pause line.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-log&quot; data-lang=&quot;log&quot;&gt;...
+[info][gc] GC(15) Pause Final Mark (process weakrefs) 86.167ms
+...&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Turns out, weak references are to blame. Put simply, weak references are a way to keep an object in memory until there is a demand for this memory. Large in-memory caches is a common use-case for weak references. If there is enough free heap, a weak reference cache entry can stay there. As soon as GC figures out that there is not enough memory, it&amp;#8217;ll deallocate weak references. In most of the cases, this is a much better outcome than the application failing with an out of memory exception because of a cache.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A frantic search across the repository doesn’t show any usages of weak, soft or phantom references. Not even the search through the third party libraries can show anything. After staring at the metrics for a while, one of the graphs gives a clue! The long GC pauses correlate with a sudden drop in the number of direct byte buffers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;GC vs DirectByteBuffer count&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/allocatedirect/jmc-gc.png&quot; alt=&quot;jmc gc&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+You can get a similar graph by running the echo app and connecting to the JMX port. For this screenshot, I used Java Mission Control (JMC). The &lt;a href=&quot;https://github.com/SerCeMan/allocatedirect/blob/master/start.sh#L53&quot;&gt;start.sh&lt;/a&gt; script contains the options that you can enable to connect to an app with JMX remotely.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At first, the correlation might not make any sense. Byte buffers are not weak references, are they? They are not weak references themselves. However, you might notice, that creating a new direct byte buffer gives you back a plain &lt;code&gt;ByteBuffer&lt;/code&gt; interface which doesn&amp;#8217;t have a &lt;code&gt;close&lt;/code&gt; method or any other way of deallocating the buffer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;ByteBuffer buf = ByteBuffer.allocateDirect(42);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The underlying buffer needs to go away once the last reference to this buffer goes away. The modern API for this in Java is &lt;a href=&quot;https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/lang/ref/Cleaner.html&quot;&gt;&lt;code&gt;java.lang.ref.Cleaner&lt;/code&gt;&lt;/a&gt;. As we can see, it&amp;#8217;s exactly what &lt;code&gt;DirectByteBuffer&lt;/code&gt; class uses to determine when the underlying buffer should be deallocated.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;https://github.com/openjdk/jdk13/blob/dcd4014cd8a6f49a564cbb95387ad01a80a20bed/src/java.base/share/classes/java/nio/Direct-X-Buffer.java.template#L113-L141&quot;&gt;DirectByteBuffer&lt;/a&gt; constructor&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;DirectByteBuffer(int cap) {
+    // ...
+    base = UNSAFE.allocateMemory(size); // malloc call
+    UNSAFE.setMemory(base, size, (byte) 0);
+    // ...
+    cleaner = Cleaner.create(this, new Deallocator(base, size, cap));
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Yet, there are no usages of direct buffers in the code of the echo app either, so how could we find them? One way would be to search through the third party libraries using IntelliJ. The approach would work very well for the echo example but would completely fail for any real applications of a decent size. There are just way too many places where byte buffers are used. Looking at the graphs, one can notice that the number of created buffers per minute is huge, literally millions of them.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Instead of searching through the code to find all byte buffer references, it is easier to find the place at runtime. One way to find out where the majority of the buffers is created is to fire up the async profiler and profile the &lt;a href=&quot;https://man7.org/linux/man-pages/man3/malloc.3.html&quot;&gt;&lt;code&gt;malloc&lt;/code&gt;&lt;/a&gt; calls which are used by direct buffers to allocate memory.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;# async profiler can be downloaded from https://github.com/jvm-profiling-tools/async-profiler
+./profiler.sh -d 30 -f /tmp/flamegraph.svg $(pgrep -f java) -e malloc&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;While running, the profiler managed to sample more than 500000 malloc calls which non-ambiguously show where all of the buffers were created from.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;malloc calls&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/mallocflame.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;mallocflame&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+The flame graph above visualises the code paths where most of the captured malloc calls occur. The wider the column is, the larger the number of times the code path appeared in the sample. This graph, as well as other flame graphs in this article, is clickable. You can read more on how to read flame graphs &lt;a href=&quot;http://www.brendangregg.com/flamegraphs.html&quot;&gt;here&lt;/a&gt;.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As it turned out, there was a place in the code which was using direct buffers. With this rich knowledge of where exactly the direct buffer allocations occur, creating a fix is easy. All that&amp;#8217;s needed is to make a one line change and to replace &lt;code&gt;allocateDirect&lt;/code&gt; with &lt;code&gt;allocate&lt;/code&gt; and send a &lt;a href=&quot;https://github.com/rsocket/rsocket-java/pull/945&quot;&gt;PR upstream&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Running the same app on shenandoah after applying the single line change produces a completely different graph which pleases the eyes with sub-millisecond GC pauses.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Shenandoah GC&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/allocatedirect/shenandoah-heap.png&quot; alt=&quot;shenandoah heap&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_the_costs&quot;&gt;The costs&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The story revealed a dark side of direct byte buffers. If there is a dark side, there must be a bright side as well! There is. But before we look at the bright side, we need to explore a few more sides which also appeared to be grey.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_allocations&quot;&gt;Allocations&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Previously, we’ve observed implicit deallocations costs, so now it’s time to take a look at allocations. Could direct buffers be much cheaper to create? After all, going off-heap has been a performance trend for a while. A small benchmark can help to estimate the costs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;https://github.com/SerCeMan/allocatedirect/blob/master/bench/src/main/java/me/serce/AllocateBuffer1.java&quot;&gt;AllocationBenchmark.java&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@Param({&quot;128&quot;, &quot;1024&quot;, &quot;16384&quot;})
+int size;
+
+@Benchmark
+public ByteBuffer heap() {
+  return ByteBuffer.allocate(size);
+}
+
+@Benchmark
+public ByteBuffer direct() {
+  return ByteBuffer.allocateDirect(size);
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;After cloning the repo, you can run the benchmark yourself with the command below.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;# Don't just read! Clone the repo and try yourself! 🤓
+./bench.sh alloc1&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The absolute numbers are not that interesting. Even the slowest operation only takes a few microseconds. But the difference between the heap buffers and direct buffers is fascinating.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Benchmark               (size)  Mode  Cnt     Score     Error  Units
+AllocateBuffer1.direct     128  avgt    5  1022.137 ± 148.510  ns/op
+AllocateBuffer1.heap       128  avgt    5    23.969 ±   0.051  ns/op
+
+AllocateBuffer1.direct    1024  avgt    5  1228.785 ± 127.090  ns/op
+AllocateBuffer1.heap      1024  avgt    5   179.350 ±   2.989  ns/op
+
+AllocateBuffer1.direct   16384  avgt    5  3039.485 ± 111.714  ns/op
+AllocateBuffer1.heap     16384  avgt    5  2620.722 ±   5.395  ns/op&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Even though direct buffers lose in all of the runs, the difference is much more noticeable on small buffers while on large buffers, the overhead is almost negligible. Due to the 50x difference on a small buffer, it’s a much more compelling example to look into. Let’s start a benchmark again, make it run for much longer, and use async profiler to see what where the time is spent.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;ByteBuffer.allocateDirect()&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/alloc_direct_perf.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;alloc direct perf&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The flame graph already hints towards some of the overhead. Not only the direct buffers need to allocate memory, but it also needs to reserve it to check the maximum native memory limit. On top of this, the buffer needs to be zeroed as &lt;code&gt;malloc&lt;/code&gt; can&amp;#8217;t guarantee that it doesn&amp;#8217;t return you some garbage while the buffer needs to be ready to use. And finally, it needs to register itself for deallocation as a soft reference. All of this seems like a lot of work, but the actual allocation still takes a half of the time! So, even if the heap buffer doesn&amp;#8217;t need to do any work other than calling &lt;code&gt;malloc&lt;/code&gt;, it should only be as twice as slow, not 50 times! Profiling heap buffer allocations can hopefully reveal where such a vast difference is coming from.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;ByteBuffer.allocate()&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/alloc_heap_perf.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;alloc heap perf&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The heap buffer flame graph is surprisingly blank. There isn&amp;#8217;t much happening on the graph. Yet, there are still some allocations in the yellow flame tower on the right. However, the whole allocation path only takes 2% of the time, and the rest is nothing? Exploring the yellow tower gives a further clue. Most of its time is taken by a function that&amp;#8217;s called &lt;code&gt;MemAllocator::allocate_inside_tlab_slow&lt;/code&gt;. The meaning of the &lt;code&gt;allocate_slow&lt;/code&gt; part is self-explanatory, but it&amp;#8217;s &lt;code&gt;inside_tlab&lt;/code&gt; that is the answer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;TLAB stands for Thread Local Allocation Buffer. TLAB is a space in the Eden, the space where all new objects are born, dedicated for each thread to allocate objects. When different threads allocate memory, they don’t have to contend on the global memory. Every thread allocates objects locally, and because the buffer is not shared with other threads, there is no need to use call &lt;code&gt;malloc&lt;/code&gt;. All that’s needed is to move the pointer by a few bytes. The fact that most of the allocations happen in TLAB could explain why heap buffers are so much faster when their size is small. When the size is large, the allocations won’t occur in TLAB due to the limits on its size, which will result in buffer allocation times being almost on par.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that we&amp;#8217;ve assumed that we know why it&amp;#8217;s so much faster, can we jump to the next section? Not so fast!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So far, TLAB is just a theory, and we need to conduct an experiment to validate it. One of the easiest ways is to simply disable TLAB with the &lt;code&gt;-XX:-UseTLAB&lt;/code&gt; options.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;// run with ./bench.sh alloc4
+@Fork(jvmArgsAppend = { &quot;-XX:-UseTLAB&quot; })
+@Benchmark
+public ByteBuffer heap() {
+  return ByteBuffer.allocate(size);
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Benchmark             (size)  Mode  Cnt    Score   Error  Units
+AllocateBuffer2.heap     128  avgt    5  151.999 ± 8.477  ns/op&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Were we right? Yes and no. The performance results with disabled TLAB are not as impressive anymore. Though, the pure allocation time is still about three times faster even considering that the benchmark needs to not only allocate memory for the buffer itself but also for the &lt;code&gt;ByteBuffer&lt;/code&gt; class. The still significant difference shows the cost of going back to the operating system with a syscall every time to ask for more memory with occasional page faults.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;ByteBuffer.allocate(), -XX:-UseTLAB&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/alloc_heap_no_tlab.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;alloc heap no tlab&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As a rule of thumb, if your buffers are mostly short-lived and small, using heap byte buffers will likely be a more performant choice for you. Conveniently, it&amp;#8217;s exactly what the javadoc of the ByteBuffer class is warning us about.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;blockquote&gt;
+It is therefore recommended that direct buffers be allocated primarily for large, long-lived buffers that are subject to the underlying system&amp;#8217;s native I/O operations.
+&lt;/blockquote&gt;
+&lt;div class=&quot;attribution&quot;&gt;
+&amp;#8212; ByteBuffer.java
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect4&quot;&gt;
+&lt;h5 id=&quot;_memory_costs&quot;&gt;Memory costs&lt;/h5&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So far, we&amp;#8217;ve only been measuring allocations. Still, looking at the flame graphs, we can also see the de-allocation path which is frequently invoked by JMH that runs the benchmarks by explicitly invoking &lt;a href=&quot;https://github.com/openjdk/jmh/blob/4264de9486c32b48da8161e3ac076a0187b4176f/jmh-core/src/main/java/org/openjdk/jmh/runner/BaseRunner.java#L273&quot;&gt;&lt;code&gt;System.gc()&lt;/code&gt;&lt;/a&gt; and finalization before each iteration. That way, the previously allocated buffers will be deallocated.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;However, in the real applications, as we saw in the debugging story, we&amp;#8217;re at a mercy of the GC to deallocate those buffers. In this case, the amount of memory consumed by the app might be hard to predict as it depends on the GC and how the GC behaves on this workload. For how long would the following code run?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;public class HeapMemoryChaser {
+  public static void main(String[] args) {
+    while (true) {
+      ByteBuffer.allocate(1024);
+    }
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The code above contains an infinite loop, so you can say forever, and you will be completely right. There are no conditions, so there is nothing that can prevent the loop from running. Will this snippet run forever too?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;public class DirectMemoryChaser {
+  public static void main(String[] args) {
+    while (true) {
+      ByteBuffer.allocateDirect(1024);
+    }
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Will the above code run forever as well? It depends on how lucky we are. There are no guarantees on when a GC would clean up the allocated direct buffers. Various JVM options can vary the result from run forever with no issues to a crash after a few seconds. Running the above code with &lt;code&gt;-Xmx6G&lt;/code&gt; on a VM with 8GB RAM runs for about 20 seconds until it gets killed by the operating system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ time java -Xmx6G DirectMemoryChaser
+Killed
+
+real	0m24.211s&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;code&gt;dmesg&lt;/code&gt; shows an insightful message explaining that the process was killed due to lack of memory.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[...] Out of memory: Killed process 4560 (java) total-vm:10119088kB, anon-rss:7624780kB, file-rss:1336kB, shmem-rss:0kB, UID:1000 pgtables:15216kB oom_score_adj:0
+[...] oom_reaper: reaped process 4560 (java), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Allocating direct buffers without care can cause the app to go far beyond the expected memory usage as there are no guarantees on when the soft references are going to be cleaned. Crashing right after the start is counterintuitively a good result. At least, you can observe the failure, reproduce it, understand it and fix it. A crash after a few hours of running is much worse, and without a clear feedback loop, it&amp;#8217;s much harder to resolve the issue.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When debugging such issues, or as a preventative measure, consider using &lt;code&gt;-XX:+AlwaysPreTouch&lt;/code&gt; to at least exclude the heap growth out of the equation. One way to prevent this is to run the infinite growth of direct buffers is to use &lt;code&gt;-XX:MaxDirectMemorySize=${MAX_DIRECT_MEM}&lt;/code&gt; to ensure that the usage of direct memory doesn&amp;#8217;t grow uncontrollably.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_the_benefits&quot;&gt;The benefits&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So far, the direct byte buffers have only caused troubles. In the story, switching to heap-based byte buffers was a clear win, though there are a lot of hidden dangers in using them. Would it be reasonable to use heap byte buffers only and never use direct buffers? The choice exists for a reason, and there reasons to use direct buffers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_off_heap_graal&quot;&gt;Off Heap Graal&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We have observed problems with allocations and deallocations, so what if a buffer is only allocated once and never deallocated? One buffer is not enough most of the time, so you can create a pool of buffers, borrow them for some time and then return back. It is what Netty does with their &lt;a href=&quot;https://netty.io/wiki/using-as-a-generic-library.html&quot;&gt;&lt;code&gt;ByteBuf&lt;/code&gt;&lt;/a&gt; classes which are built to fix some of the downsides of the &lt;code&gt;ByteBuffer&lt;/code&gt; class. Nevertheless, it&amp;#8217;s still not clear why one should prefer direct buffers over heap buffers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Avoiding GC altogether could be one of the reason. You could be managing terabytes of memory without any GC overhead. While you could manage large amounts of memory with direct byte buffers, there is a limit of 2^31 on the indices that you can use with a single buffer. A solution is coming in the form of a &lt;a href=&quot;https://openjdk.java.net/jeps/383&quot;&gt;Foreign-Memory Access API&lt;/a&gt; which is available for the second preview in JDK 15. But avoiding GC is not the main reason.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_io&quot;&gt;IO&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The IO is where direct byte buffers shine! Let&amp;#8217;s say we need to copy some memory between two files. Heap byte buffers are obviously backed by memory in a heap, so the contents of the files would have to be copied to be sent back seconds later. This can be avoided completely with direct byte buffers. Direct byte buffers excel when you don&amp;#8217;t need a buffer per se but rather a pointer to a piece of memory somewhere outside of the heap. Again, at this point, this is only a hypothesis of a random person on the internet. Let&amp;#8217;s prove or disprove it with the following benchmark.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;https://github.com/SerCeMan/allocatedirect/blob/master/bench/src/main/java/me/serce/CopyFileBenchmark.java&quot;&gt;CopyFileBenchmark.java&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@Benchmark // ./bench.sh reverse
+public void reverseBytesInFiles() throws Exception {
+  ByteBuffer buf = this.buffer;
+  buf.clear();
+  try (FileChannel channel1 = FileChannel.open(Paths.get(DIR + &quot;file1&quot;), READ);
+       FileChannel channel2 = FileChannel.open(Paths.get(DIR + &quot;file2&quot;), WRITE)) {
+    while (buf.hasRemaining()) {
+      channel1.read(buf);
+    }
+    buf.put(0, buf.get(SIZE - 1));
+    buf.flip();
+    while (buf.hasRemaining()) {
+      channel2.write(buf);
+    }
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The code above reads  64 MB of random data from the first files, reverses the byte order of each long in the array and then puts it back. Reversing the first and the last bytes here is a tiny operation which the only goal is to modify the contents of the file in some way as copying could simply be done by calling &lt;code&gt;channel.transferTo&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The results show that the direct buffer is the clear winner, almost twice as fast!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Benchmark                              (bufferType)  Mode  Cnt   Score   Error  Units
+CopyFileBenchmark.reverseBytesInFiles        direct  avgt    5  36.383 ± 0.683  ms/op
+CopyFileBenchmark.reverseBytesInFiles          heap  avgt    5  59.816 ± 0.834  ms/op&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The next step is to understand where the time was spent to validate our hypothesis. Taking a flamegraph for the direct buffer shows what we expected — all of the time spent in kernel reading and writing files.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Directy Buffer&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/reverse_offheap.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;reverse offheap&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For the heap buffer, for both operations, reading and writing, the memory has to be copied first between the buffers which we can clearly see from the flamegraph. A solid chunk of it is taken by the &lt;code&gt;copyMemory&lt;/code&gt; function.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Heap Buffer&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/reverse_heap.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;reverse heap&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The IO here does not only refer to writing to disk, but it can also be writing to a socket which is what a considerable portion of the java applications is performing all day non-stop. As you can see, carefully choosing your buffers can significantly affect performance.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;_endianness&quot;&gt;Endianness&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Can direct byte buffers be even faster? While reading the javadoc for create methods, note an important remark:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;blockquote&gt;
+The new buffer&amp;#8217;s position will be zero, its limit will be its capacity, its mark will be undefined, each of its elements will be initialized to zero, and its byte order will be ByteOrder#BIG_ENDIAN.
+&lt;/blockquote&gt;
+&lt;div class=&quot;attribution&quot;&gt;
+&amp;#8212; ByteBuffer.java
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The byte order of byte buffers created in java is always big endian by default. While having an always predictable default is great, it also means that sometimes, it might not match the endianness of the underlying platform. In the case of an &lt;code&gt;m5.large&lt;/code&gt; AWS instance, this is indeed the case.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;jshell&amp;gt; java.nio.ByteOrder.nativeOrder()
+$1 ==&amp;gt; LITTLE_ENDIAN&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This fact immediately raises the question if, or rather when changing endianness can yield any significant performance wins. The only way to find out is to measure it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;https://github.com/SerCeMan/allocatedirect/blob/master/bench/src/main/java/me/serce/OrderBenchmark.java&quot;&gt;OrderBenchmark.java&lt;/a&gt;&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;static final int SIZE = 1024 * 1024 * 1024;
+
+@Param({&quot;direct-native-order&quot;, &quot;direct&quot;})
+String bufferType;
+
+@Setup
+public void setUp() throws Exception {
+  switch (bufferType) {
+    case &quot;direct&quot;:
+      buffer = ByteBuffer.allocateDirect(SIZE); break;
+    case &quot;direct-native-order&quot;:
+      buffer = ByteBuffer.allocateDirect(SIZE).order(ByteOrder.nativeOrder()); break;
+  }
+  channel = FileChannel.open(Paths.get(&quot;/dev/urandom&quot;), READ);
+  while (buffer.hasRemaining()) { channel.read(buffer); }
+  buffer.flip();
+  this.buffer = buffer.asLongBuffer();
+}
+
+@Benchmark // run with ./bench.sh order
+public long sumBytes() {
+  long sum = 0;
+  for (int i = 0; i &amp;lt; SIZE / 8; i++) {
+    sum += buffer.get(i);
+  }
+  return sum;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The above benchmark measures a specific use-case. We load a gigabyte worth of random longs into memory. Then, we simply read them one by one. It’s interesting that depending on the endianness, the result will be different as it affects the order of the bytes. We don’t care about the byte order for this use-case, however, as a random value with reversed byte order is still a random value.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Benchmark                       (bufferType)  Mode  Cnt    Score   Error  Units
+OrderBenchmark.sumBytes  direct-native-order  avgt    5  136.025 ± 2.262  ms/op
+OrderBenchmark.sumBytes               direct  avgt    5  195.980 ± 8.360  ms/op&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The first impression is that iterating through a gigabyte worth of random memory is pretty darn fast. The second is that the native order byte buffer is performing 1.5 times faster! As before, running async profiler helps to reveal the reason why the native order is more performant.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Non-native (Big Endian)&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/sum_big_endian.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;sum big endian&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph text-center&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Native (Little Endian)&lt;/div&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;object type=&quot;image/svg+xml&quot; data=&quot;/img/allocatedirect/sum_native_endian.svg&quot;&gt;&lt;span class=&quot;alt&quot;&gt;sum native endian&lt;/span&gt;&lt;/object&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Comparing the graphs above, the first difference that stands out is that byte buffer classes are actually different depending on the byte order. The native buffer is &lt;code&gt;DirectLongBufferU&lt;/code&gt; while the non-native one is &lt;code&gt;DirectLongBufferS&lt;/code&gt;. The main difference between them is the presence of the &lt;code&gt;Bits.swap&lt;/code&gt; method.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Looking further into the method, we can see that it delegates directly to &lt;code&gt;Long.reverseBytes&lt;/code&gt;. While its implementation in Java is quite complex, one can notice the &lt;code&gt;@HotSpotIntrinsicCandidate&lt;/code&gt; annotation. The annotation is a signal that at runtime, JIT could replace the method with pre-prepared assembly code. Adding a set of JVM options, &lt;code&gt;-XX:CompileCommand=print,*OrderBenchmark.sumBytes*&lt;/code&gt;, to the benchmark allows us to peek at the resulting assembly code to understand how exactly the &lt;code&gt;reverseBytes&lt;/code&gt; affects the resulting code.&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-cols stretch&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Non-native (Big Endian)&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Native (Little Endian)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;....
+loop:
+ mov    r10d,DWORD PTR [rdx+0x14]
+ mov    ecx,DWORD PTR [r10+0x8]
+ mov    r8,r10                  ; &amp;lt;- buffer
+ cmp    ecx,0x16577b
+ jne    0x00007f9d5c277070
+ mov    ebx,DWORD PTR [r8+0x1c] ; &amp;lt;- limit
+ cmp    r11d,ebx
+ jge    0x00007f9d5c277078  ; checkIndex(i)
+ mov    r10,QWORD PTR [r8+0x10]
+ movsxd r8,r11d
+ shl    r8,0x3
+ add    r8,r10
+ mov    r10,r8
+ mov    r10,QWORD PTR [r10] ; r10 = get(i)
+ bswap  r10                 ; reverseBytes(r10)
+ add    rax,r10             ; sum += r10
+ inc    r11d                ; i+=1
+ cmp    r11d,0x8000000      ; i &amp;lt; SIZE/8
+ jl     loop
+...&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;...
+loop:
+ mov    r11d,DWORD PTR [r8+0x14] ; &amp;lt;- buffer
+ mov    r9d,DWORD PTR [r11+0x1c] ; &amp;lt;- limit
+ cmp    ecx,r9d
+ jge    0x00007f268c274f57 ; checkIndex(i)
+ mov    r10,QWORD PTR [r11+0x10]
+ movsxd r11,ecx
+ shl    r11,0x3
+ add    r11,r10
+ mov    r10,r11
+ add    rbx,QWORD PTR [r10] ; sum += get(i)
+ inc    ecx                 ; i+=1
+ cmp    ecx,0x8000000       ; i &amp;lt; SIZE/8
+ jl     loop
+...&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Comparing the compilations listings of these two implementations, we can notice that the biggest difference between them is the &lt;code&gt;bswap&lt;/code&gt; instruction which is the essence of the &lt;code&gt;Bytes.swap&lt;/code&gt; method. As expected, it reverses the byte order every time a long is read from the buffer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Reading a gigabyte of memory into longs is an interesting workload, but it’s not necessarily the one that you’re likely to encounter in production. Endianness can be a useful thing to remember about, but unless working with native libraries or working with massive files, it’s unlikely to be a concern.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Every non-trivial Java application directly or indirectly uses byte buffers. On the surface, ByteBuffer is a simple class. It’s just a pointer to a chunk of memory. Nevertheless, even by looking at such a simple class, you can discover a deep rabbit hole. Even though we’ve only looked at the tip of the iceberg, I hope that you have a clear idea now of when you could use a heap buffer, and when you would choose a direct buffer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Modern JVM runtimes are complicated environments. While they provide sane defaults, they also present multiple options. The choice is always there, it&amp;#8217;s up to you to make that choice, but it&amp;#8217;s crucial to be aware of the consequences. Fortunatelly, JVM runtimes also come with a whole lot of various observability tools, JMX metrics, GC logs, profilers, and if you really want it&amp;#8217;s not even that hard to look at the generated assembly code. Using techniques shown in this article, you can make a choice not for the workload of a guy from the internet, but for &lt;em&gt;your&lt;/em&gt; workload, which can result in amazing results in production later. We have to care more about later sometimes, you know.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_thank_you_to&quot;&gt;Thank you to&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Uri Baghin, and &lt;a href=&quot;https://twitter.com/ptuls&quot;&gt;Paul Tune&lt;/a&gt; for reviewing the article.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You for reading the article.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Are you as passionate about Java as I and my colleagues at Canva are? &lt;a href=&quot;https://jobs.lever.co/canva/ca10485f-80af-4fa4-9367-9558304cd614?cp=reactivejobs&quot;&gt;Join us&lt;/a&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_share_this_article&quot;&gt;Share this article&lt;/h3&gt;
+&lt;hr&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;&amp;quot;You don&amp;#39;t need no Service Mesh&amp;quot;. Just published a new blog post with an anti-hype opinion on the over-hyped topic. &lt;a href=&quot;https://t.co/SVXS3nWKzj&quot;&gt;https://t.co/SVXS3nWKzj&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1286242507664191488?ref_src=twsrc%5Etfw&quot;&gt;July 23, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;_references&quot;&gt;References&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/jvm-profiling-tools/async-profiler/&quot;&gt;Async Profiler&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=iwSCtxMbBLI&quot;&gt;Beyond ByteBuffers by Brian Goetz&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://gceasy.io/&quot;&gt;GC Easy GC Analyser&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://shipilev.net/jvm/anatomy-quarks/4-tlab-allocation/&quot;&gt;JVM Anatomy Quark #4: TLAB allocation&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=DKJ0w30M0vg&quot;&gt;Netty - One Framework to rule them all by Norman Maurer&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://netty.io/wiki/using-as-a-generic-library.html&quot;&gt;Netty&amp;#8217;s ByteBuf API&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+<enclosure>
+
+</enclosure>
+<pubDate>
+Wed, 18 Nov 2020 00:00:00 +1100
+</pubDate>
+</item>
 <item>
 <guid>
 http://serce.me/posts/23-07-2020-you-dont-need-no-service-mesh/
@@ -37,7 +719,7 @@ You don't need no Service Mesh
 &lt;div class=&quot;paragraph text-center&quot;&gt;
 &lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/servicemesh/rick.png&quot; alt=&quot;rick&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;div class=&quot;quoteblock text-center&quot;&gt;
 &lt;blockquote&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;There&amp;#8217;s a lesson here, and I&amp;#8217;m not going to be the one to figure it out.&lt;/p&gt;
@@ -220,7 +902,7 @@ The matter of time()
 &lt;div class=&quot;paragraph text-center&quot;&gt;
 &lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/img/time/time_1.png&quot; alt=&quot;time 1&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;quoteblock&quot;&gt;
+&lt;div class=&quot;quoteblock text-center&quot;&gt;
 &lt;blockquote&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;What would be the biological reality of planet earth rotating once every eighteen hours instead of twenty-four? You have less time, but you have more days in the year. So there’s a sense of losing something, and also gaining something. With an 18-hour clock there’s a lot more yesterdays.&lt;/p&gt;
@@ -743,7 +1425,7 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;What we need is a reliable replacement for our system clocks, so that for every two events &lt;em&gt;A&lt;/em&gt; and &lt;em&gt;B&lt;/em&gt; we can say that either &lt;em&gt;A&lt;/em&gt; happened before &lt;em&gt;B&lt;/em&gt;, or &lt;em&gt;B&lt;/em&gt; happened before &lt;em&gt;A&lt;/em&gt;. Such order between events is called total order. In the &lt;a href=&quot;https://lamport.azurewebsites.net/pubs/time-clocks.pdf&quot;&gt;&quot;Time, Clocks, and the Ordering of Events in a Distributed System&quot;&lt;/a&gt; paper Leslie Lamport described the &quot;happens before&quot; relation and logical clocks that can be used to define total order for a set of events using the following algorithm.&lt;/p&gt;
 &lt;/div&gt;
-&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;table class=&quot;tableblock frame-all grid-all stretch&quot;&gt;
 &lt;colgroup&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
@@ -754,13 +1436,13 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Receiving a message&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;time = time + 1;
 send(message, time);&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;(message, ts) = receive();
 time = max(ts, time) + 1;&lt;/code&gt;&lt;/pre&gt;
@@ -795,7 +1477,7 @@ On the slides below Alice tells Bob the value which she wrote to the first node.
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;To deal with truly concurrent events, we need a new definition or order which is able to express the situation in which events can happen concurrently. Such order is called partial order. Basically, this means that for any two events &lt;em&gt;A&lt;/em&gt; and &lt;em&gt;B&lt;/em&gt;, it&amp;#8217;s possible to say whether &lt;em&gt;A&lt;/em&gt; happened before &lt;em&gt;B&lt;/em&gt;, &lt;em&gt;B&lt;/em&gt; happened before &lt;em&gt;A&lt;/em&gt; or &lt;em&gt;A&lt;/em&gt; and &lt;em&gt;B&lt;/em&gt; happened concurrently. To determine partial order the following algorithm can be used this, where every actor has a separate time counter, and keeps track of the latest timestamp of any other actor in the system.&lt;/p&gt;
 &lt;/div&gt;
-&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;table class=&quot;tableblock frame-all grid-all stretch&quot;&gt;
 &lt;colgroup&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
@@ -806,13 +1488,13 @@ On the slides below Alice tells Bob the value which she wrote to the first node.
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Receiving a message&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;V[myId] = V[myId] + 1
 send(message, V);&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-pseudocode&quot; data-lang=&quot;pseudocode&quot;&gt;(message, Vr) = receive();
 for (i, v) in Vr {
@@ -2369,7 +3051,7 @@ As an &lt;a href=&quot;http://hg.openjdk.java.net/panama/panama/hotspot/file/681
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Let&amp;#8217;s compare assembly produced by the JVM after compiling and inlining for every method.&lt;/p&gt;
 &lt;/div&gt;
-&lt;table class=&quot;tableblock frame-all grid-cols spread fit-table&quot;&gt;
+&lt;table class=&quot;tableblock frame-all grid-cols stretch fit-table&quot;&gt;
 &lt;colgroup&gt;
 &lt;col style=&quot;width: 33.3333%;&quot;&gt;
 &lt;col style=&quot;width: 33.3333%;&quot;&gt;
@@ -2384,7 +3066,7 @@ As an &lt;a href=&quot;http://hg.openjdk.java.net/panama/panama/hotspot/file/681
 &lt;/thead&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;[Verified Entry Point]
  sub  rsp,0x18
@@ -2402,7 +3084,7 @@ exit:
  test DWORD PTR [rip+0x15b4ea60],eax&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;[Verified Entry Point]
  sub  rsp,0x18
@@ -2423,7 +3105,7 @@ exit:
  test DWORD PTR [rip+0x16d21852],eax&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;[Verified Entry Point]
  mov  DWORD PTR [rsp-0x14000],eax
@@ -2628,7 +3310,7 @@ ChecksumBenchmark.plainJava            129536  avgt    4  34.414 ±  0.984  us/o
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;And as a result, GCC didn&amp;#8217;t perform well, and we&amp;#8217;ve got an almost literal translation of that we wrote in C++ to assembly. At the same time, JIT gave us a good unrolled loop.&lt;/p&gt;
 &lt;/div&gt;
-&lt;table class=&quot;tableblock frame-all grid-cols spread&quot;&gt;
+&lt;table class=&quot;tableblock frame-all grid-cols stretch&quot;&gt;
 &lt;colgroup&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
@@ -2641,7 +3323,7 @@ ChecksumBenchmark.plainJava            129536  avgt    4  34.414 ±  0.984  us/o
 &lt;/thead&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;....
 loop:
@@ -2667,7 +3349,7 @@ loop:
 ....&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;...
 loop:
@@ -2706,7 +3388,7 @@ ChecksumBenchmark.plainJava              129536  avgt    4  34.825 ±  1.178  us
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;There is a simple explanation why GCC -03 version is faster than code emitted by JIT. Here GCC was able to vectorize our loop. So, it used SIMD instructions which gave our processor an ability to &quot;parallelize&quot; execution.&lt;/p&gt;
 &lt;/div&gt;
-&lt;table class=&quot;tableblock frame-all grid-cols spread&quot;&gt;
+&lt;table class=&quot;tableblock frame-all grid-cols stretch&quot;&gt;
 &lt;colgroup&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
 &lt;col style=&quot;width: 50%;&quot;&gt;
@@ -2719,7 +3401,7 @@ ChecksumBenchmark.plainJava              129536  avgt    4  34.825 ±  1.178  us
 &lt;/thead&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;....
 loop:
@@ -2745,7 +3427,7 @@ loop:
 ....&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div class=&quot;content&quot;&gt;&lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-x86asm&quot; data-lang=&quot;x86asm&quot;&gt;....
 loop:

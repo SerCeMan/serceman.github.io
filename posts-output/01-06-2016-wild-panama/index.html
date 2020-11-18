@@ -209,7 +209,7 @@ As an <a href="http://hg.openjdk.java.net/panama/panama/hotspot/file/6818b4b2e92
 <div class="paragraph">
 <p>Let&#8217;s compare assembly produced by the JVM after compiling and inlining for every method.</p>
 </div>
-<table class="tableblock frame-all grid-cols spread fit-table">
+<table class="tableblock frame-all grid-cols stretch fit-table">
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -224,7 +224,7 @@ As an <a href="http://hg.openjdk.java.net/panama/panama/hotspot/file/6818b4b2e92
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-x86asm" data-lang="x86asm">[Verified Entry Point]
  sub  rsp,0x18
@@ -242,7 +242,7 @@ exit:
  test DWORD PTR [rip+0x15b4ea60],eax</code></pre>
 </div>
 </div></div></td>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-x86asm" data-lang="x86asm">[Verified Entry Point]
  sub  rsp,0x18
@@ -263,7 +263,7 @@ exit:
  test DWORD PTR [rip+0x16d21852],eax</code></pre>
 </div>
 </div></div></td>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-x86asm" data-lang="x86asm">[Verified Entry Point]
  mov  DWORD PTR [rsp-0x14000],eax
@@ -468,7 +468,7 @@ ChecksumBenchmark.plainJava            129536  avgt    4  34.414 ±  0.984  us/o
 <div class="paragraph">
 <p>And as a result, GCC didn&#8217;t perform well, and we&#8217;ve got an almost literal translation of that we wrote in C++ to assembly. At the same time, JIT gave us a good unrolled loop.</p>
 </div>
-<table class="tableblock frame-all grid-cols spread">
+<table class="tableblock frame-all grid-cols stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -481,7 +481,7 @@ ChecksumBenchmark.plainJava            129536  avgt    4  34.414 ±  0.984  us/o
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-x86asm" data-lang="x86asm">....
 loop:
@@ -507,7 +507,7 @@ loop:
 ....</code></pre>
 </div>
 </div></div></td>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-x86asm" data-lang="x86asm">...
 loop:
@@ -546,7 +546,7 @@ ChecksumBenchmark.plainJava              129536  avgt    4  34.825 ±  1.178  us
 <div class="paragraph">
 <p>There is a simple explanation why GCC -03 version is faster than code emitted by JIT. Here GCC was able to vectorize our loop. So, it used SIMD instructions which gave our processor an ability to "parallelize" execution.</p>
 </div>
-<table class="tableblock frame-all grid-cols spread">
+<table class="tableblock frame-all grid-cols stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -559,7 +559,7 @@ ChecksumBenchmark.plainJava              129536  avgt    4  34.825 ±  1.178  us
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-x86asm" data-lang="x86asm">....
 loop:
@@ -585,7 +585,7 @@ loop:
 ....</code></pre>
 </div>
 </div></div></td>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-x86asm" data-lang="x86asm">....
 loop:

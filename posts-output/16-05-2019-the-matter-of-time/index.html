@@ -75,7 +75,7 @@
 <div class="paragraph text-center">
 <p><span class="image"><img src="/img/time/time_1.png" alt="time 1"></span></p>
 </div>
-<div class="quoteblock">
+<div class="quoteblock text-center">
 <blockquote>
 <div class="paragraph">
 <p>What would be the biological reality of planet earth rotating once every eighteen hours instead of twenty-four? You have less time, but you have more days in the year. So there’s a sense of losing something, and also gaining something. With an 18-hour clock there’s a lot more yesterdays.</p>
@@ -598,7 +598,7 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 <div class="paragraph">
 <p>What we need is a reliable replacement for our system clocks, so that for every two events <em>A</em> and <em>B</em> we can say that either <em>A</em> happened before <em>B</em>, or <em>B</em> happened before <em>A</em>. Such order between events is called total order. In the <a href="https://lamport.azurewebsites.net/pubs/time-clocks.pdf">"Time, Clocks, and the Ordering of Events in a Distributed System"</a> paper Leslie Lamport described the "happens before" relation and logical clocks that can be used to define total order for a set of events using the following algorithm.</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -609,13 +609,13 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 <td class="tableblock halign-left valign-top"><p class="tableblock">Receiving a message</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-pseudocode" data-lang="pseudocode">time = time + 1;
 send(message, time);</code></pre>
 </div>
 </div></div></td>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-pseudocode" data-lang="pseudocode">(message, ts) = receive();
 time = max(ts, time) + 1;</code></pre>
@@ -650,7 +650,7 @@ On the slides below Alice tells Bob the value which she wrote to the first node.
 <div class="paragraph">
 <p>To deal with truly concurrent events, we need a new definition or order which is able to express the situation in which events can happen concurrently. Such order is called partial order. Basically, this means that for any two events <em>A</em> and <em>B</em>, it&#8217;s possible to say whether <em>A</em> happened before <em>B</em>, <em>B</em> happened before <em>A</em> or <em>A</em> and <em>B</em> happened concurrently. To determine partial order the following algorithm can be used this, where every actor has a separate time counter, and keeps track of the latest timestamp of any other actor in the system.</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -661,13 +661,13 @@ On the slides below Alice tells Bob the value which she wrote to the first node.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Receiving a message</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-pseudocode" data-lang="pseudocode">V[myId] = V[myId] + 1
 send(message, V);</code></pre>
 </div>
 </div></div></td>
-<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-pseudocode" data-lang="pseudocode">(message, Vr) = receive();
 for (i, v) in Vr {

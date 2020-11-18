@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: com.headius/invokebinder:1.11">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/headius/invokebinder/1.11/invokebinder-1.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
