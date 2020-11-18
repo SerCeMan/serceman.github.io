@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Wed, 18 Nov 2020 20:33:41 +1100
+Wed, 18 Nov 2020 20:39:04 +1100
 </lastBuildDate>
 <generator>
 clj-rss
@@ -650,7 +650,7 @@ loop:
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;Uri Baghin, and &lt;a href=&quot;https://twitter.com/ptuls&quot;&gt;Paul Tune&lt;/a&gt; for reviewing the article.&lt;/p&gt;
+&lt;p&gt;Uri Baghin and &lt;a href=&quot;https://twitter.com/ptuls&quot;&gt;Paul Tune&lt;/a&gt; for reviewing the article.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;You for reading the article.&lt;/p&gt;
@@ -658,7 +658,7 @@ loop:
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Are you as passionate about Java as I and my colleagues at Canva are? &lt;a href=&quot;https://jobs.lever.co/canva/ca10485f-80af-4fa4-9367-9558304cd614?cp=reactivejobs&quot;&gt;Join us&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;Are you as passionate about Java as my colleagues and I are? &lt;a href=&quot;https://jobs.lever.co/canva/ca10485f-80af-4fa4-9367-9558304cd614?cp=reactivejobs&quot;&gt;Join us at Canva&lt;/a&gt;!&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
