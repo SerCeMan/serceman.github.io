@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Wed, 18 Nov 2020 20:39:04 +1100
+Wed, 18 Nov 2020 20:52:55 +1100
 </lastBuildDate>
 <generator>
 clj-rss
@@ -664,7 +664,7 @@ loop:
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_share_this_article&quot;&gt;Share this article&lt;/h3&gt;
 &lt;hr&gt;
-&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;&amp;quot;You don&amp;#39;t need no Service Mesh&amp;quot;. Just published a new blog post with an anti-hype opinion on the over-hyped topic. &lt;a href=&quot;https://t.co/SVXS3nWKzj&quot;&gt;https://t.co/SVXS3nWKzj&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1286242507664191488?ref_src=twsrc%5Etfw&quot;&gt;July 23, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just published a new blog post &amp;quot;Indirect Effects of Allocate Direct&amp;quot;. JVM, byte buffers, native memory, debugging GC side effects, profiling in prod, and even some Intel x86 inside. &lt;a href=&quot;https://t.co/oE6s88CMeu&quot;&gt;https://t.co/oE6s88CMeu&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1328999241541328897?ref_src=twsrc%5Etfw&quot;&gt;November 18, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_references&quot;&gt;References&lt;/h3&gt;
