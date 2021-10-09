@@ -9,7 +9,7 @@
  :author-root-uri    "authors"
  :rss-name           "feed.xml"
  :rss-filters        ["cryogen"]
- :recent-posts       6
+ :recent-posts       7
  :post-date-format   "dd-MM-yyyy"
  :sass-src           nil
  :sass-dest          nil
@@ -18,7 +18,7 @@
  :disqus?            true
  :disqus-shortname   "serceman"
  :ignored-files      [#"\.#.*" #".*\.swp$"]
- :posts-per-page     5
+ :posts-per-page     7
  :blocks-per-preview 2
  :previews?          false
  :clean-urls?        true}

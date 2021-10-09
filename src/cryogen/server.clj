@@ -37,6 +37,8 @@
 
 (comment
 
+  ; or lein ring server
+
   (init)
 
   (ring/serve handler {:port          3000
