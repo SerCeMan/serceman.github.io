@@ -12,7 +12,7 @@ http://serce.me/
 Personal blog
 </description>
 <lastBuildDate>
-Fri, 15 Oct 2021 00:08:51 +1100
+Fri, 15 Oct 2021 00:30:18 +1100
 </lastBuildDate>
 <generator>
 clj-rss
@@ -259,7 +259,7 @@ The Five Lies Analysis
 &lt;p&gt;Five Whys analysis is a useful technique that is easy to remember and a helpful reminder to always look deeper. However, using it directly would only yield a cause, not the root cause, as rarely there is such thing as the root cause. The approach could still be used to deepen the scope of searching for action items. Still, structuring this tool into a template as the primary driver of a root cause analysis can cause more harm than good.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Instead, the template could facilitate learning and help build a story by asking the questions, i.e., questions that can help understand the whole story deeply. Then, a comprehensive list of action items can stem from the story preventing not only incidents with a similar &quot;root cause&quot; but a whole class of failures.&lt;/p&gt;
+&lt;p&gt;Instead, the template could facilitate learning and help build a story by asking questions that can help understand the whole story deeply. Then, a comprehensive list of action items can stem from the story preventing not only incidents with a similar &quot;root cause&quot; but a whole class of failures.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
@@ -278,7 +278,7 @@ The Five Lies Analysis
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;_share_this_article&quot;&gt;Share this article&lt;/h3&gt;
 &lt;hr&gt;
-&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just published a new blog post &amp;quot;Indirect Effects of Allocate Direct&amp;quot;. JVM, byte buffers, native memory, debugging GC side effects, profiling in prod, and even some Intel x86 inside. &lt;a href=&quot;https://t.co/oE6s88CMeu&quot;&gt;https://t.co/oE6s88CMeu&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1328999241541328897?ref_src=twsrc%5Etfw&quot;&gt;November 18, 2020&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Just published some musings on using the five l̶i̶e̶s̶ whys analysis for incident postmortems and other investigations.&lt;a href=&quot;https://t.co/mMHdPB0F6U&quot;&gt;https://t.co/mMHdPB0F6U&lt;/a&gt;&lt;/p&gt;&amp;mdash; Sergey Tselovalnikov (@SerCeMan) &lt;a href=&quot;https://twitter.com/SerCeMan/status/1448641518370103303?ref_src=twsrc%5Etfw&quot;&gt;October 14, 2021&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
 &lt;/div&gt;
 </description>
 <enclosure>
@@ -927,9 +927,6 @@ loop:
 &lt;p&gt;You for reading the article.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Are you as passionate about Java as my colleagues and I are? &lt;a href=&quot;https://jobs.lever.co/canva/ca10485f-80af-4fa4-9367-9558304cd614?cp=reactivejobs&quot;&gt;Join us at Canva&lt;/a&gt;!&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
@@ -1829,9 +1826,6 @@ V[myId] = V[myId] + 1;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Uri Baghin for reviewing the article&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Are you as passionate about distributed systems as me and my colleagues at Canva are? &lt;a href=&quot;https://www.canva.com/careers/jobs/senior-software-engineer-java-apis-gateways/?cp=sercemej&quot;&gt;Join us&lt;/a&gt;, we are growing our &lt;a href=&quot;https://www.canva.com/careers/jobs/senior-software-engineer-java-apis-gateways/?cp=sercemeg&quot;&gt;API Gateway&lt;/a&gt; team to take on a big new project!&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
