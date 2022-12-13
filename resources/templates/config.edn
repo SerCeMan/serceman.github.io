@@ -18,7 +18,7 @@
  :disqus?            true
  :disqus-shortname   "serceman"
  :ignored-files      [#"\.#.*" #".*\.swp$"]
- :posts-per-page     7
+ :posts-per-page     8
  :blocks-per-preview 2
  :previews?          false
  :clean-urls?        true}
