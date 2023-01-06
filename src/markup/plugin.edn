@@ -1,2 +1,0 @@
-{:description "AsciiDoc parser"
- :init        markup.asciidoc/init}

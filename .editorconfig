@@ -1,0 +1,4 @@
+[{*.html, *.css, *.ts, *.tsx}]
+indent_size = 2
+indent_style = space
+

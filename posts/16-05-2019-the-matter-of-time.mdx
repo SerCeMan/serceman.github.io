@@ -1,0 +1,797 @@
+---
+title: The matter of time()
+description: Empty
+date: '2019-05-16'
+---
+
+import Quote from "../components/Quote";
+import CanvaEmbed from "../components/CanvaEmbed";
+import CheckResults from "../components/matteroftime/CheckResults";
+import TimeQuizChooser from "../components/matteroftime/TimeQuizChooser";
+
+Hi!
+
+As software engineers, we all rely on the notion of time: a crucial
+concept in ensuring that events in our programs follow a chronological
+order. Yet, invoking a simple call to “get the current time” can
+potentially yield unexpected results and lead to unforeseen consequences
+if not used correctly. Moreover, the invariants about time we observe on
+our local development machine may not necessarily hold in the cloud, or
+in any distributed system.
+
+In this article, I’ll go through the different ways we can obtain the
+current time in our programs, and present cases where our intuitions and
+expectations of time from these clocks may mislead us at best or cause
+catastrophic failures at worst.
+
+![](/images/time/time_1.png)
+
+<Quote
+    quote="What would be the biological reality of planet earth rotating once every
+    eighteen hours instead of twenty-four? You have less time, but you have more days
+    in the year. So there’s a sense of losing something, and also gaining something.
+    With an 18-hour clock there’s a lot more yesterdays."
+    attribution="Untitled (Clock) 2014"
+/>
+
+
+| ⚠️  | This article is illustrated with examples of code in Java. However, most of the content of this article is applicable to any language or runtime. |
+|-----|---------------------------------------------------------------------------------------------------------------------------------------------------|
+
+## Your local clocks
+
+Let me start by asking you six questions. Here is a set of code
+snippets. Is it possible that the expression passed to `isThisPossible`
+is true? Take a guess.
+
+<div className="formalpara-title">
+
+    <span id="aq1"></span>1. Is this possible?
+
+</div>
+
+``` java
+long t1 = System.currentTimeMillis();
+long t2 = System.currentTimeMillis();
+
+isThisPossible(t2 - t1 == 0);
+```
+
+<TimeQuizChooser id="q1" />
+
+<div class="formalpara-title">
+
+    <span id="aq2"></span>2. Is this possible?
+
+</div>
+
+``` java
+long t1 = System.nanoTime();
+long t2 = System.nanoTime();
+
+isThisPossible(t2 - t1 == 0);
+```
+
+<TimeQuizChooser id="q2" />
+
+<div class="formalpara-title">
+
+    <span id="aq3"></span>3. Is this possible?
+
+</div>
+
+``` java
+long t1 = System.currentTimeMillis();
+long t2 = System.currentTimeMillis();
+
+isThisPossible(t2 < t1);
+```
+
+<TimeQuizChooser id="q3" />
+
+
+<div class="formalpara-title">
+
+    <span id="aq4"></span>4. Is this possible?
+
+</div>
+
+``` java
+long t1 = System.nanoTime();
+long t2 = System.nanoTime();
+
+isThisPossible(t2 < t1);
+```
+
+<TimeQuizChooser id="q4" />
+
+<div class="formalpara-title">
+
+    <span id="aq5"></span>5. Is this possible?
+
+</div>
+
+``` java
+long t1 = System.currentTimeMillis();
+
+isThisPossible(t1 < 0);
+```
+
+<TimeQuizChooser id="q5" />
+
+<div class="formalpara-title">
+
+    <span id="aq6"></span>6. Is this possible?
+
+</div>
+
+``` java
+long t1 = System.nanoTime();
+
+isThisPossible(t1 < 0);
+```
+
+<TimeQuizChooser id="q6" />
+
+<CheckResults/>
+
+Was the result surprising? My sincere kudos if it was not. The next
+section of the article will explain why certain behaviour can or can not
+be observed.
+
+But why do we even care? Very often we don’t need to, but the snippets
+of code where the business logic relies on the observed timestamps are
+typically critical pieces of infrastructure code where correctness is a
+must. False assumptions in these parts of the code can lead to huge
+incidents. This, for instance, happened to [Cloudflare in
+2017](https://blog.cloudflare.com/how-and-why-the-leap-second-affected-cloudflare-dns/),
+where the root cause "was the belief that time cannot go backwards".
+Cloudflare is one of the few companies that openly publishes incident
+reports, but it’s not uncommon to suffer from such false assumptions, as
+a few Google searches can confirm, and we can all learn from these
+mistakes. To understand why certain clocks behave in a certain way, we
+first need to understand what properties different clocks can give us.
+
+### Monotonicity
+
+The first property is monotonicity. A monotonically increasing function
+means that for every subsequent invocation of such a function the
+produced value is never smaller than any of the previous values. So, a
+monotonic clock is a clock that never goes backwards. Sadly, and
+surprisingly, this property is not a feature of many clocks.
+
+### Resolution
+
+Resolution is the second property. It is the smallest observable
+difference between two clock ticks. The resolution of a simple
+mechanical watch with a second hand is one second. When you’re staring
+at the watch, the meaningful watch hand position can be at 12 seconds or
+13 seconds, but never 12 and a half.
+
+### Latency
+
+Very often latency is overlooked when we’re talking about clocks, but
+it’s quite important when we’re considering other properties like
+resolution. For instance, it doesn’t matter if you have the most precise
+atomic watch on your hand with picosecond resolution ‒ if I ask you what
+time it is and it takes you roughly a second, sometimes less, sometimes
+more, to take a look and respond, all of this precision fades away.
+
+So, what properties do Java clocks have, and how do they apply to the
+questions that we looked at the beginning?
+
+## Clocks on the wall
+
+Let’s start with `System.currentTimeMillis()`. Usually, the best place
+to start the exploration is the documentation written in the Javadoc,
+and there is a lot there to take in. Here is an excerpt of what is
+important to us right now.
+
+<div class="formalpara-title">
+
+    _[Javadoc](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/java.base/share/classes/java/lang/System.java#l375)_
+
+</div>
+
+``` java
+/**
+ * Returns the current time in milliseconds. Note that
+ * while the unit of time of the return value is a millisecond,
+ * the granularity of the value depends on the underlying
+ * operating system and may be larger.  For example, many
+ * operating systems measure time in units of tens of
+ * milliseconds.
+ *
+ * ...
+ *
+ * @return  the difference, measured in milliseconds, between
+ *          the current time and midnight, January 1, 1970 UTC.
+ */
+public static native long currentTimeMillis();
+```
+
+As we can see, the clock provides us with a millisecond precision value
+but the actual resolution depends on the operating system. Moreover, if
+we measure the latency by measuring the execution time, it will be way
+below 1 millisecond, so it’s maybe not a surprise that the answer to the
+[first question](#aq1) was yes.
+
+But can it go backwards? The Javadoc doesn’t mention anything about
+monotonicity, so we need to dig deeper, and take a look at the
+implementation.
+
+
+| ⚠️ | This article only explores the native implementation for Linux and MacOS. However, similar techniques can be applied to other operating systems as well.|
+|----|---|
+
+The method is native, so the implementation depends on the underlying
+OS. The native implementation for Linux and MacOS look almost identical.
+
+<div class="formalpara-title">
+
+    _[Linux](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1204)_
+
+</div>
+
+``` cpp
+jlong os::javaTimeMillis() {
+  timeval time;
+  int status = gettimeofday(&time, NULL);
+  assert(status != -1, "linux error");
+  return jlong(time.tv_sec) * 1000  +  jlong(time.tv_usec / 1000);
+}
+```
+
+<div class="formalpara-title">
+
+    _[MacOS](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/bsd/os_bsd.cpp#l893)_
+
+</div>
+
+``` cpp
+jlong os::javaTimeMillis() {
+  timeval time;
+  int status = gettimeofday(&time, NULL);
+  assert(status != -1, "bsd error");
+  return jlong(time.tv_sec) * 1000  +  jlong(time.tv_usec / 1000);
+}
+```
+
+The functions invoke exactly the same syscall, `gettimeofday`. The man
+page can provide us with more info, but more importantly with some
+valuable notes:
+
+<div class="formalpara-title">
+
+    _[man page](http://man7.org/linux/man-pages/man2/gettimeofday.2.html)_
+
+</div>
+
+```
+NAME
+       gettimeofday, settimeofday - get / set time
+
+NOTES
+       The time returned by gettimeofday() is affected by discontinuous
+       jumps in the system time (e.g., if the system administrator manually
+       changes the system time).  If you need a monotonically increasing
+       clock, see clock_gettime(2).
+```
+
+As noted above, the time is affected by discontinuous jumps in the
+system time, which could be backwards, hence the clock is not monotonic.
+The answer to the [third question](#aq3) was yes which does make sense:
+if we change the current time to one hour ago, we still want
+`currentTimeMillis` to return current time, even though the definition
+of the current time has changed. That’s why it’s often called wall-clock
+time, the clock on the wall can also jump back in time if we adjust it.
+
+### The nanos of the current time
+
+The same exploration path can be taken for `System.nanoTime()`. Let’s
+start from the Javadoc which has even more intriguing details than the
+previous one; here is an excerpt.
+
+<div class="formalpara-title">
+
+    _[Javadoc](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/java.base/share/classes/java/lang/System.java#l394)_
+
+</div>
+
+``` java
+/**
+ * Returns the current value of the running Java Virtual Machine's
+ * high-resolution time source, in nanoseconds.
+ *
+ * This method can only be used to measure elapsed time and is
+ * not related to any other notion of system or wall-clock time.
+ * The value returned represents nanoseconds since some fixed but
+ * arbitrary <i>origin</i> time (perhaps in the future, so values
+ * may be negative) ...
+ *
+ * <p>This method provides nanosecond precision, but not necessarily
+ * nanosecond resolution ...
+ *
+ * <p>The values returned by this method become meaningful only when
+ * the difference between two such values, obtained within the same
+ * instance of a Java virtual machine, is computed.
+ *
+ * ...
+ */
+public static native long nanoTime();
+```
+
+Apparently, the time returned by this clock isn’t related to any
+real-world time; it can only be used to compare the timestamps within
+the same JVM instance, and it’s relative to an arbitrary “origin” which
+can be in the future, and therefore it might be negative – which answers
+the [sixth question](#aq3). Similar to `currentTimeMillis`, this method
+provides nanosecond precision, but not necessarily nanosecond
+resolution.
+
+Nano time can only be used to measure time intervals, so it ought to be
+monotonic, right? Unfortunately, the Javadoc doesn’t say anything about
+monotonicity, so the next step is the implementation.
+
+<div class="formalpara-title">
+
+    _[Linux](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1301)_
+
+</div>
+
+``` cpp
+jlong os::javaTimeNanos() {
+  if (os::supports_monotonic_clock()) {
+    struct timespec tp;
+    int status = Linux::clock_gettime(CLOCK_MONOTONIC, &tp);
+    assert(status == 0, "gettime error");
+    jlong result = jlong(tp.tv_sec) * (1000 * 1000 * 1000) + jlong(tp.tv_nsec);
+    return result;
+  } else {
+    timeval time;
+    int status = gettimeofday(&time, NULL);
+    assert(status != -1, "linux error");
+    jlong usecs = jlong(time.tv_sec) * (1000 * 1000) + jlong(time.tv_usec);
+    return 1000 * usecs;
+  }
+}
+```
+
+Here comes the first surprise: nano time is indeed monotonic but
+_only_ if the underlying operating system supports it. To be fair, any
+modern Linux server supports `CLOCK_MONOTONIC`; there are, however, some
+[rare situations](https://stackoverflow.com/a/51345008/1542319) in which
+it might not hold true.
+
+<div class="formalpara-title">
+
+    _[MacOS](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/bsd/os_bsd.cpp#l893)_
+
+</div>
+
+``` cpp
+jlong os::javaTimeNanos() {
+  const uint64_t tm = mach_absolute_time();
+  const uint64_t now = (tm * Bsd::_timebase_info.numer) / Bsd::_timebase_info.denom;
+  const uint64_t prev = Bsd::_max_abstime;
+  if (now <= prev) {
+    return prev;   // same or retrograde time;
+  }
+  const uint64_t obsv = Atomic::cmpxchg(now, &Bsd::_max_abstime, prev);
+  assert(obsv >= prev, "invariant");   // Monotonicity
+  // If the CAS succeeded then we're done and return "now".
+  // If the CAS failed and the observed value "obsv" is >= now then
+  // we should return "obsv".  If the CAS failed and now > obsv > prv then
+  // some other thread raced this thread and installed a new value, in which case
+  // we could either (a) retry the entire operation, (b) retry trying to install now
+  // or (c) just return obsv.  We use (c).   No loop is required although in some cases
+  // we might discard a higher "now" value in deference to a slightly lower but freshly
+  // installed obsv value.   That's entirely benign -- it admits no new orderings compared
+  // to (a) or (b) -- and greatly reduces coherence traffic.
+  // We might also condition (c) on the magnitude of the delta between obsv and now.
+  // Avoiding excessive CAS operations to hot RW locations is critical.
+  // See https://blogs.oracle.com/dave/entry/cas_and_cache_trivia_invalidate
+  return (prev == obsv) ? now : obsv;
+}
+```
+
+The first thing that stands out is the giant wall of comments. As
+software engineers, we know that if there is a long comment then
+something dodgy must be going on. Indeed, the comment is quite
+interesting. The call to
+[`mach_absolute_time`](https://opensource.apple.com/source/Libc/Libc-320.1.3/i386/mach/mach_absolute_time.c.auto.html)
+uses the [RDTSC](https://en.wikipedia.org/wiki/Time_Stamp_Counter)
+instruction underneath which can _potentially_ lead to non-monotonic
+behaviour on machines with multiple CPU sockets, which recently span up
+another thought-provoking discussion on the [mechanical
+sympathy](https://groups.google.com/forum/#!topic/mechanical-sympathy/7WnH37dA6Yc)
+mailing list.
+
+So, at least, we can be confident that nano time is always monotonic on
+MacOS, right? Actually, it depends on the JVM version. The code listed
+above was introduced in JDK9 in
+[JDK-8040140](https://bugs.openjdk.java.net/browse/JDK-8040140) and
+backported to JDK8. Before, all you could hope for was non-monotonic
+time which provided at best microsecond resolution because
+`gettimeofday` was used. If we run some
+[benchmarks](https://shipilev.net/blog/2014/nanotrusting-nanotime/#_latency),
+we’ll see that the latency for these calls can be as small as 30ns, so
+suddenly the answer to the [second](#aq2) and the [fourth](#aq4)
+questions is true, or rather "it depends".
+
+### When milliseconds are not enough
+
+The microsecond precision in the case of `gettimeofday` is much more
+than `System.currentTimeMillis()` can give us, but in the process of
+conversion precision is lost.
+
+``` cpp
+jlong os::javaTimeMillis() {
+  timeval time;
+  int status = gettimeofday(&time, NULL);
+  assert(status != -1, "linux error");
+  return jlong(time.tv_sec) * 1000  +  jlong(time.tv_usec / 1000);
+                                                      // ^^ precision loss
+}
+```
+
+The OS can give us additional information which we violently discard in
+order to fit it into a single long. What if we really want to know these
+micros? In JDK 8, the new JSR 310 arrived which made it possible to
+obtain an instance of `Instant` class which contains the number of
+seconds since the epoch and the number of nanoseconds since the last
+second started.
+
+<div class="formalpara-title">
+
+    _[JSR 310: Date and Time API](https://jcp.org/en/jsr/detail?id=310)_
+
+</div>
+
+``` java
+Instant instant = Clock.systemUTC().instant();
+long epochSecond = instant.getEpochSecond();
+int nanoSinceSecond = instant.getNano();
+```
+
+Finally, all Java developers got access to wall-clock time with high
+precision, right? Not so fast, if we take a look at the implementation
+in JDK8, we’ll find out that it simply delegates straight to
+`System.currentTimeMillis()`.
+
+<div class="formalpara-title">
+
+    _[JDK8
+    Clock](http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/java/time/Clock.java#l469)_
+
+</div>
+
+``` java
+@Override
+public long millis() {
+    return System.currentTimeMillis();
+}
+@Override
+public Instant instant() {
+    return Instant.ofEpochMilli(millis());
+}
+```
+
+Evidently, this is not optimal and there is a corresponding issue
+[JDK-8068730](https://bugs.openjdk.java.net/browse/JDK-8068730) which
+has already been resolved and as a result, the precision was increased.
+It requires an update to JDK9+ where the method delegates to a native
+call with the following implementation on Linux. Assuming that your OS
+can provide microsecond resolution, this clock is a great example of a
+clock with nanosecond precision, but only microsecond resolution.
+
+<div class="formalpara-title">
+
+    _[JDK9+
+    Clock](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1211)_
+
+</div>
+
+``` java
+void os::javaTimeSystemUTC(jlong &seconds, jlong &nanos) {
+  timeval time;
+  int status = gettimeofday(&time, NULL);
+  assert(status != -1, "linux error");
+  seconds = jlong(time.tv_sec);
+  nanos = jlong(time.tv_usec) * 1000;
+}
+```
+
+## Time exchange
+
+The possibility to get the current wall-clock time with microsecond
+resolution is great, but is needed often? One of the reasons to use
+wall-clock time is to be able to relate an event that happened on one
+machine to another event that happened on a different machine, or more
+precisely, to decide on the order of these events. The events can be
+very different in nature. Some of them might not be very critical, like
+the timestamp on a log line, but some of them must be correct, like when
+there is a conflict in a database due to two values being written
+concurrently and timestamps are used to determine which event was last.
+This strategy is called Last Write Wins, or simply LWW.
+
+<CanvaEmbed designID="DADZmyL_mRw"/>
+
+On the slides above, two clients Alice and Bob are trying to write
+simultaneously into an eventually consistent webscale database with two
+nodes. While the first value written by Alice was successfully
+synchronized, Alice’s second write happened to be at approximately the
+same time as Bob’s. In this situation, the database must resolve the
+conflict so that the data is consistent between all of the nodes. In the
+case of LWW, the latest write will be chosen by comparing the timestamps
+of each write. LWW works perfectly if the clocks are perfectly
+synchronised, however, if the clocks are poorly synchronised and the
+clock of the first node has drifted ahead of the second node, LWW
+becomes Lucky Write Wins – the client connected to the lucky node always
+wins the conflict.
+
+### NTP
+
+The standard approach to make sure that the clocks on different nodes in
+the cluster are synchronized is to use Network Time Protocol (NTP). Not
+only does NTP help synchronise clocks, it also helps propagate a leap
+second flag. Leap second is an occasional event where an additional
+second is introduced in between 23:59:59 of a chosen day and 00:00:00 of
+the following day. It’s often implemented as playing the same second
+twice which from the observer’s point of view might look like a jump 1
+second back in time. The last leap second was introduced on the 31st of
+December 2016 which resulted in the above-mentioned DNS incident.
+
+![](/images/time/time_2.png)
+
+The conventional way of dealing with leap seconds is "leap smearing".
+The NTP server which is responsible for leap smearing can distribute the
+additional second amongst 12 hours before and 12 hours after the second
+is introduced. The wall-clock time during these 24 hours is ticking
+slower and every second is 1/86400 longer which might be surprising,
+however less surprising than a jump back in time. The catch is that not
+many NTP servers support leap smearing, the public NTP servers most
+definitely don’t.
+
+The major cloud providers,
+[Google](https://developers.google.com/time/smear) and
+[AWS](https://aws.amazon.com/blogs/aws/look-before-you-leap-the-coming-leap-second-and-aws/)
+both provide NTP services with leap smearing support. If your
+application is hosted on a platform that provides an NTP service and you
+care about clock synchronisation it’s worthwhile checking that NTP
+synchronisation is set up with the provider’s NTP service. Not only can
+it help avoid the nasty consequences of applying leap seconds naïvely,
+but it also dramatically decreases the synchronisation error since the
+network latency is typically much lower within a single datacenter.
+
+<div class="formalpara-title">
+
+    _AWS NTP with chrony_
+
+</div>
+
+``` shell
+sergey:~$ chronyc sources -v
+210 Number of sources = 9
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
+| /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+===============================================================================
+^* 169.254.169.123               3  10   377   433    -25us[  -36us] +/-  356us
+```
+
+Using a local NTP server can reduce the clock drift down to milliseconds
+or even microseconds in the best case, but what is the worst case? There
+is not much research on this topic, however some notable results were
+mentioned in the Google Spanner paper.
+
+> Between synchronizations, a daemon advertises a slowly increasing time
+> uncertainty. ε is derived from conservatively applied worst-case local
+> clock drift. ε also depends on time-master uncertainty and
+> communication delay to the time masters. In our production
+> environment, ε is typically a sawtooth function of time, varying from
+> about 1 to 7 ms over each poll interval. ε̅ is therefore 4 ms most of
+> the time. The daemon’s poll interval is currently 30 seconds, and the
+> current applied drift rate is set at 200 microseconds/second, which
+> together accounts for the sawtooth bounds from 0 to 6 ms.\
+> —  Spanner: Google’s Globally-Distributed Database
+
+## Logical conclusion
+
+Even if the monitoring in our cluster shows that the clocks are
+synchronised with microsecond precision, we need to be cautious and
+shouldn’t rely on this in our software if a failure of this assumption
+is unacceptable. So, if a failure is unacceptable and we need to know
+the order of the events in a distributed system, is there anything we
+can do? As always, there is a number of solutions suggested by academia.
+
+### Lamport clocks
+
+What we need is a reliable replacement for our system clocks, so that
+for every two events *A* and *B* we can say that either *A* happened
+before *B*, or *B* happened before *A*. Such order between events is
+called total order. In the ["Time, Clocks, and the Ordering of Events in
+a Distributed
+System"](https://lamport.azurewebsites.net/pubs/time-clocks.pdf) paper
+Leslie Lamport described the "happens before" relation and logical
+clocks that can be used to define total order for a set of events using
+the following algorithm.
+
+<table>
+    <colgroup>
+        <col style={{width: "50%"}}/>
+        <col style={{width: "50%"}}/>
+    </colgroup>
+    <tbody>
+    <tr class="odd">
+        <td style={{textAlign: "left"}}><p>Sending a message</p></td>
+        <td style={{textAlign: "left"}}><p>Receiving a message</p></td>
+    </tr>
+    <tr class="even">
+        <td style={{textAlign: "left"}}><pre class="pseudocode">
+```
+time = time + 1;
+send(message, time);
+```
+        </pre>
+        </td>
+        <td style={{textAlign: "left"}}><pre class="pseudocode">
+```
+(message, ts) = receive();
+time = max(ts, time) + 1;
+```
+</pre>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+Every actor, in this case, Alice and Bob, will maintain a shared view of
+the current time by maintaining a `time` counter which increases every
+time a message is sent, and when a message is received, the `time` is
+always bigger than the last observed counter. That way if Alice updates
+the Database as shown below with the value 2 and tells Bob about the
+last known state, Bob’s final write carries with it the knowledge of
+seeing Alice’s counter, so it’s chosen as the final state of the
+database.
+
+| ❗️ | In the slides below, Alice tells Bob the value she wrote to the first node. Alternatively, Bob could have read the same value from the first node, leading to the same result – Alice and Bob don't have to communicate directly. |
+|----|---|
+
+<CanvaEmbed designID="DADZnGWHlAU"/>
+
+This works perfectly as long as we need to define some total order of
+the events in the system which captures the causality. It’s important to
+note that having total order means that concurrent events will be
+ordered in some way, not necessarily the most logical way. On the slides
+below, Alice never talked to Bob, but her counter is bigger which leads
+to her write being chosen in the case of a conflict.
+
+<CanvaEmbed designID="DADZnC8PNnM"/>
+
+
+### Vector clocks
+
+To deal with truly concurrent events, we need a new definition or order
+which is able to express the situation in which events can happen
+concurrently. Such order is called partial order. Basically, this means
+that for any two events *A* and *B*, it’s possible to say whether *A*
+happened before *B*, *B* happened before *A* or *A* and *B* happened
+concurrently. To determine partial order the following algorithm can be
+used this, where every actor has a separate time counter, and keeps
+track of the latest timestamp of any other actor in the system.
+
+<table>
+    <colgroup>
+        <col style={{width: "50%"}}/>
+        <col style={{width: "50%"}}/>
+    </colgroup>
+    <tbody>
+    <tr class="odd">
+        <td style={{textAlign: "left"}}><p>Sending a message</p></td>
+        <td style={{textAlign: "left"}}><p>Receiving a message</p></td>
+    </tr>
+    <tr class="even">
+        <td style={{textAlign: "left"}}><pre class="pseudocode">
+```
+V[myId] = V[myId] + 1
+send(message, V);
+```
+        </pre>
+        </td>
+        <td style={{textAlign: "left"}}><pre class="pseudocode">
+```
+(message, Vr) = receive();
+for (i, v) in Vr {
+    V[i] = max(V[i], v);
+}
+V[myId] = V[myId] + 1;
+```
+    </pre>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+The algorithm was described in 1988, and later using vector clocks for
+conflict resolution in a database was described in the Dynamo paper. On
+the following slides, Alice keeps track of her own time counter as well
+as Bob’s last known time counter. That way when Alice sends a message to
+Bob, he updates his counters and the next message sent to the database
+is chosen during the conflict resolution because each component of Bob’s
+time vector is larger than the respective component of the previous
+vector.
+
+<CanvaEmbed designID="DADZnKp0nOE"/>
+
+When there is a real conflict, vector clocks can help to determine
+whether the events were truly concurrent. In the scenario below, two
+nodes end up with the events, `[0, 1]` and `[0, 1]` which cannot be
+ordered. In this situation, the database can keep both values, and
+return them the next time it is read, to let either Alice or Bob decide
+which one to keep so that the data is not lost.
+
+<CanvaEmbed designID="DADZnBQkwxE"/>
+
+These properties, however, do not come for free. The metadata needs to
+be exchanged with every message, and multiple versions need to be
+stored. After all, some databases, like Cassandra don’t use vector
+clocks [for a reason](https://www.datastax.com/dev/blog/why-cassandra-doesnt-need-vector-clocks).
+
+## Conclusion
+
+- Use `System.nanoTime()` for measuring time intervals
+
+- Use `System.currentTimeMillis()` for obtaining wall-clock time
+
+- Use `Clock.systemUTC().instant()` for getting wall-clock time with ns
+*precision*
+
+- Not every clock can give you the resolution you want even if its
+precision is high
+
+- The wall-clock time can be off by dozens of milliseconds (or more, or
+less)
+
+- Use NTP from your cloud provider if time synchronisation matters
+
+- Logical clocks might be more appropriate than the real clocks but they
+have associated costs
+
+## Thanks
+
+- You for reading this article
+- Uri Baghin for reviewing the article
+
+## References
+
+- [Nanotrusting the Nanotime](https://shipilev.net/blog/2014/nanotrusting-nanotime/)
+- [Spanner: Google’s Globally-Distributed Database](https://www.usenix.org/system/files/conference/osdi12/osdi12-final-16.pdf)
+- [AWSNTP](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html) / [Google NTP](https://developers.google.com/time/)
+- [Video PWLSF - Bryan Fink on "A Brief History of NTP Time: Memoirs of an Internet Timekeeper"](https://www.youtube.com/watch?v=un1AHZBgFfk)
+- [Internet time synchronization: the network time protocol](https://ieeexplore.ieee.org/abstract/document/103043/)
+- [How and why the leap second affected Cloudflare DNS](https://blog.cloudflare.com/how-and-why-theleap-second-affected-cloudflare-dns/)
+- [The trouble with timestamps](https://aphyr.com/posts/299-the-trouble-with-timestamps)
+- [Time, Clocks, and the Ordering of Events in a Distributed System](http://lamport.azurewebsites.net/pubs/time-clocks.pdf)
+- [Timestamps in Message-Passing Systems That Preserve the Partial Ordering](http://zoo.cs.yale.edu/classes/cs426/2012/lab/bib/fidge88timestamps.pdf)
+- [Synchronizing Clocks In a Cassandra Cluster](https://blog.rapid7.com/2014/03/14/synchronizing-clocksin-a-cassandra-cluster-pt-1-the-problem/)
+- [Why Cassandra doesn’t need vector clocks](https://www.datastax.com/dev/blog/why-cassandra-doesnt-need-vector-clocks)
+- [Dynamo: Amazon’s Highly Available Key-value Store](https://www.allthingsdistributed.com/files/amazondynamo-sosp2007.pdf)
+- [Why Vector Clocks Are Easy](http://basho.com/posts/technical/why-vector-clocks-are-easy/)
+- [Why Vector Clocks Are Hard](http://basho.com/posts/technical/why-vector-clocks-are-hard/)
+
+## Discuss on
+
+* [Twitter](https://twitter.com/SerCeMan/status/1128963307753287680)
+* [Hacker News](https://news.ycombinator.com/item?id=20173673)
+* [Reddit](https://www.reddit.com/r/java/comments/bpc0im/the_matter_of_time/)
+
+
+
