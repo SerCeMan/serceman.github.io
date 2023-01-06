@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Leiningen: org.asciidoctor/asciidoctorj:1.5.4">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/asciidoctor/asciidoctorj/1.5.4/asciidoctorj-1.5.4.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

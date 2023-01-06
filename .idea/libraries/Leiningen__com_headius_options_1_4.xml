@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Leiningen: com.headius/options:1.4">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/headius/options/1.4/options-1.4.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
