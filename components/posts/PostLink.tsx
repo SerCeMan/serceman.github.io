@@ -16,10 +16,10 @@ const PostLink = ({post}: { post: Post }): JSX.Element => {
         className="text-lg py-1">{format(parseISO(post.date), 'MMMM dd, yyyy')}</h4>
       {post.kind === "external"
         ? <Link href={post.canonicalLink}>
-        <span className="flex flex-row items-center">
+            <span className="flex flex-row items-center">
             {post.title}
-          <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-4 pl-1"/>
-          </span>
+              <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-4 pl-1"/>
+            </span>
         </Link>
         : <Link as={`/posts/${post.slug}`} href={`/posts/[slug]`}>
           {post.title}

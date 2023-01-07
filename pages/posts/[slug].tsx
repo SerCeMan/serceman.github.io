@@ -20,6 +20,7 @@ import "@fontsource/noto-serif";
 import rehypeHighlight from "rehype-highlight";
 import clojure from 'highlight.js/lib/languages/clojure'
 import x86asm from 'highlight.js/lib/languages/x86asm'
+import "highlight.js/styles/idea.css"
 import TweetEmbed from "../../components/TweetEmbed";
 import TimeQuizChooser from "../../components/matteroftime/TimeQuizChooser";
 import CheckResults from "../../components/matteroftime/CheckResults";
@@ -59,7 +60,6 @@ const PostPage = ({source, frontMatter}: PostPageProps): JSX.Element => {
   };
   return (
     <Layout customMeta={customMeta}>
-      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/styles/default.min.css"/>
       <article
         className="container mx-auto mt-12 px-10 py-8 shadow-md bg-white max-w-5xl flex flex-col">
         <p className="self-start text-sm text-gray-500">
@@ -81,7 +81,7 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
   const postFilePath = path.join(POSTS_PATH, `${params.slug}.mdx`);
   const source = fs.readFileSync(postFilePath);
 
-  const { content, data } = matter(source);
+  const {content, data} = matter(source);
 
   const mdxSource = await serialize(content, {
     // Optionally pass remark/rehype plugins
