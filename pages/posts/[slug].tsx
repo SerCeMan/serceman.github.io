@@ -26,7 +26,7 @@ import TimeQuizChooser from "../../components/matteroftime/TimeQuizChooser";
 import CheckResults from "../../components/matteroftime/CheckResults";
 import CanvaEmbed from "../../components/CanvaEmbed";
 import Quote from "../../components/Quote";
-import {Post} from "../../lib/api";
+import {Post} from "../../lib/posts";
 
 
 // Custom components/renderers to pass to MDX.

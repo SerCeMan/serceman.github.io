@@ -1,6 +1,6 @@
 import React from 'react';
 import "@fontsource/alegreya"
-import {Post} from "../../lib/api";
+import {Post} from "../../lib/posts";
 import {format, parseISO} from "date-fns";
 import Link from "next/link";
 import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";

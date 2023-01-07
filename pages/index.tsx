@@ -2,7 +2,7 @@ import {GetStaticProps} from 'next';
 import Image from 'next/image';
 import React from 'react';
 import Layout from '../components/Layout';
-import {getAllPosts, Post} from '../lib/api';
+import {getAllPosts, Post} from '../lib/posts';
 import "@fontsource/alegreya"
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faEnvelope, faUser} from "@fortawesome/free-solid-svg-icons";

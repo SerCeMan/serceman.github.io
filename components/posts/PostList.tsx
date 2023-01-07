@@ -1,7 +1,7 @@
 import React from 'react';
 import "@fontsource/alegreya"
 import PostLink from "./PostLink";
-import {Post} from "../../lib/api";
+import {Post} from "../../lib/posts";
 
 const PostList = ({posts, listClass}: { posts: Post[], listClass: string }): JSX.Element => {
   return (

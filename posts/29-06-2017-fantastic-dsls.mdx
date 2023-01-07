@@ -855,6 +855,34 @@ val <F> Cursor<Person, F>.name by Leaf<String>()
 This looks scary, but it’s just a bit of necessary boilerplate. This
 code should be read like
 
+<pre style={{margin: 0, background: "white", lineHeight: "125%"}}>
+<style>{`
+.prh-keyword {
+  color: #000080;
+  font-weight: bold;
+}
+.prh-boilerplate {
+  opacity: 0.2;
+}
+`}</style>
+<span class="prh-keyword">interface</span> Transaction
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Transaction<span class="prh-boilerplate">, F&gt;</span>.payment <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Payment<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Transaction<span class="prh-boilerplate">, F&gt;</span>.parts <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Parts<span class="prh-boilerplate">&gt;()</span>
+
+<span class="prh-keyword">interface</span> Payment
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Payment<span class="prh-boilerplate">, F&gt;</span>.currency <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>String<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Payment<span class="prh-boilerplate">, F&gt;</span>.amount <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>Int<span class="prh-boilerplate">&gt;()</span>
+
+<span class="prh-keyword">interface</span> Parts
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Parts<span class="prh-boilerplate">, F&gt;</span>.to <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Person<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Parts<span class="prh-boilerplate">, F&gt;</span>.from <span class="prh-keyword">by</span> <span class="prh-boilerplate">Node&lt;</span>Person<span class="prh-boilerplate">&gt;()</span>
+
+<span class="prh-keyword">interface</span> Person
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Person<span class="prh-boilerplate">, F&gt;</span>.id <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>Int<span class="prh-boilerplate">&gt;()</span>
+<span class="prh-keyword">val</span><span class="prh-boilerplate"> &lt;F&gt; Cursor&lt;</span>Person<span class="prh-boilerplate">, F&gt;</span>.name <span class="prh-keyword">by</span> <span class="prh-boilerplate">Leaf&lt;</span>String<span class="prh-boilerplate">&gt;()</span>
+</pre>
+
+
 The creation looks very similar to the untyped version, but it’s
 completely typed. It references properties defined above.
 
