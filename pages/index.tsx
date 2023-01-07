@@ -1,6 +1,7 @@
 import {format, parseISO} from 'date-fns';
 import {GetStaticProps} from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import React from 'react';
 import Layout from '../components/Layout';
 import {getAllPosts} from '../lib/api';
@@ -8,7 +9,7 @@ import {PostType} from '../types/post';
 import "@fontsource/alegreya"
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faEnvelope, faUser} from "@fortawesome/free-solid-svg-icons";
-
+import meJpg from '../public/images/me.jpg'
 
 type IndexProps = {
   posts: PostType[];
@@ -25,7 +26,11 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
         <div
           className="container max-w-6xl grid grid-cols-1 lg:grid-cols-12 items-center gap-4 mx-10">
           <div className="col-span-2">
-            <img className="max-h-full rounded-full" src="images/me.jpg" alt="Sergey Tselovalnikov"/>
+            <Image
+              className="max-h-full min-w-[150px] rounded-full"
+              src={meJpg}
+              alt="Sergey Tselovalnikov"
+            />
           </div>
           <div className="col-span-7 px-2">
             <p
@@ -84,17 +89,17 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
             <hr/>
             <div className="p-4">
               <p>Hi! My name is Sergey Tselovalnikov. I&apos;m a:</p>
-              <ul className="list-disc list-inside text-m font-normal pl-4 pb-4">
-                <li>Software engineer at <a href="https://about.canva.com/">Canva</a></li>
+              <ul className="list-disc text-m font-normal pl-6 pb-4">
+                <li>Software engineer at <a href="https://canva.com/about/">Canva</a></li>
                 <li>JVM platform fan</li>
                 <li>Functional programming enthusiast</li>
                 <li>Have written many lines of Java, Kotlin, Clojure, Typescript, and even
                   ClojureScript
                 </li>
                 <li>Technology internals diver</li>
-                <li>Love-hate relationship with thinking about concurrency and performance</li>
+                <li>Have a love-hate relationship with thinking about concurrency and performance</li>
                 <li>Former lead of <a href="http://jugekb.ru">JUG.EKB</a></li>
-                <li>Powerlifting, boxing, and mountain biking</li>
+                <li>Love powerlifting, boxing, and mountain biking</li>
               </ul>
               <p>
                 I believe that it is vital to understand the whole stack of technologies you use from

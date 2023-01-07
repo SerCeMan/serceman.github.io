@@ -5,6 +5,7 @@ date: '2021-10-14'
 ---
 
 import Quote from "../components/Quote";
+import Image from "next/image";
 
 
 The Five Whys analysis is a popular root cause investigation technique
@@ -12,8 +13,8 @@ with a simple premise that is asking why five times can yield the
 answer, which is the root cause. While doing so could be a helpful
 exercise, blindly applying the technique often leads to a suboptimal
 result. In this article, I’ll explore some of its tradeoffs with a
-fictional story of an incident in production at [Acme
-Corp](https://en.wikipedia.org/wiki/Acme_Corporation).
+fictional story of an incident in production at
+[Acme Corp](https://en.wikipedia.org/wiki/Acme_Corporation).
 
 ![](/images/five-lies/crew.png)
 
@@ -40,7 +41,7 @@ would write if they were the author.
 
 ### Meet Alice
 
-<img src="/images/five-lies/alice.png" width="300"/>
+<Image src="/images/five-lies/alice.png" alt="Alice" height="300" width="300"/>
 
 As we know, Alice is an on-call engineer. Her official title is SRE, and
 her job involves a deep understanding of the service state based on the
@@ -76,7 +77,7 @@ Alice is off to another incident.
 
 ### Meet Bob
 
-<img src="/images/five-lies/bob.png" width="300"/>
+<Image src="/images/five-lies/bob.png" alt="Bob" height="300" width="300"/>
 
 Bob is the backend engineer who implemented the feature in the first
 place and flipped the flag. He has the most context around the change,
@@ -111,7 +112,7 @@ the main action item to the postmortem.
 ### Meet Charlie
 
 
-<img src="/images/five-lies/charlie.png" width="300"/>
+<Image src="/images/five-lies/charlie.png" alt="Charlie" height="300" width="300"/>
 
 Charlie is a frontend engineer who implemented the feature on the
 frontend side and is responsible for Acme Corp News overall look.
@@ -144,7 +145,7 @@ she put it as an action item with the plan to implement it by Friday.
 
 ### Meet Dave
 
-<img src="/images/five-lies/dave.png" width="300"/>
+<Image src="/images/five-lies/dave.png" alt="Dave" height="300" width="300"/>
 
 Dave is an engineer on the cloud infrastructure team, and he is
 responsible for the overall health of the Acme News Corp cluster. Dave
@@ -174,7 +175,7 @@ aggressive scale-ups to handle the load as the main action item.
 
 ### Meet Erin
 
-<img src="/images/five-lies/erin.png" width="300"/>
+<Image src="/images/five-lies/erin.png" alt="Erin" height="300" width="300"/>
 
 Erin is an engineer on the core libraries team, and she is working on a
 shared set of core libraries. When she first heard about the incident
