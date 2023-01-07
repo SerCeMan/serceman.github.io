@@ -9,7 +9,7 @@ class MyDocument extends Document {
           style={{
             backgroundColor: '#f2f2f2'
           }}
-          className="bg-white text-gray-900 dark:text-white">
+          className="bg-white text-gray-900">
         <Main/>
         <NextScript/>
         </body>

@@ -8,7 +8,7 @@ export const Blog = ({posts}: { posts: Post[] }): JSX.Element => {
   return (
     <Layout>
       <div>
-        <div className="container max-w-5xl	mx-auto px-12 py-6 text-base">
+        <div className="container max-w-4xl	mx-auto px-12 py-6 text-base">
           <h1
             style={{
               fontFamily: 'Alegreya',
