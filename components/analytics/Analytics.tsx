@@ -1,6 +1,7 @@
 import React from 'react';
 import Script from "next/script";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const GoogleAnalytics = (): JSX.Element => {
   return (
     <div>
@@ -21,4 +22,14 @@ const GoogleAnalytics = (): JSX.Element => {
   );
 };
 
-export default GoogleAnalytics;
+const CloudflareAnalytics = (): JSX.Element => {
+  return (
+    <Script
+      src='https://static.cloudflareinsights.com/beacon.min.js'
+      data-cf-beacon='{"token": "a7f4e843f6de47398fd9a6ea1da66c09"}'
+      strategy="afterInteractive"
+    />
+  )
+}
+
+export default CloudflareAnalytics;

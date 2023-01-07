@@ -2,7 +2,7 @@ import React from 'react';
 import {MetaProps} from '../types/layout';
 import Head from './Head';
 import Navigation from './Navigation';
-import GoogleAnalytics from "./analytics/GoogleAnalytics";
+import Analytics from "./analytics/Analytics";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -31,7 +31,7 @@ const Layout = ({children, customMeta}: LayoutProps): JSX.Element => {
         <div>
           {children}
         </div>
-        <GoogleAnalytics/>
+        <Analytics/>
       </main>
     </>
   );
