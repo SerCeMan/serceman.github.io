@@ -1,10 +1,10 @@
 import React from 'react';
 import "@fontsource/alegreya"
 import {Post} from "../../lib/posts";
-import {format, parseISO} from "date-fns";
 import Link from "next/link";
 import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {formatDate} from "../../utils/dates";
 
 const PostLink = ({post}: { post: Post }): JSX.Element => {
   return (
@@ -13,7 +13,7 @@ const PostLink = ({post}: { post: Post }): JSX.Element => {
         style={{
           fontFamily: 'Alegreya',
         }}
-        className="text-lg py-1">{format(parseISO(post.date), 'MMMM dd, yyyy')}</h4>
+        className="text-lg py-1">{formatDate(post.date)}</h4>
       {post.kind === "external"
         ? <Link href={post.canonicalLink}>
             <span className="flex flex-row items-center">

@@ -20,6 +20,9 @@ const Navigation = (): JSX.Element => {
                 <Link href="/blog" className="text-gray-600 px-6 py-4">
                     Blog
                 </Link>
+                <Link href="/talks" className="text-gray-600 px-6 py-4">
+                    Talks
+                </Link>
             </div>
         </nav>
     );

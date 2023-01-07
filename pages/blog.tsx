@@ -4,11 +4,7 @@ import {getAllPosts, Post} from "../lib/posts";
 import {GetStaticProps} from "next";
 import PostList from "../components/posts/PostList";
 
-type IndexProps = {
-  posts: Post[];
-};
-
-export const Blog = ({posts}: IndexProps): JSX.Element => {
+export const Blog = ({posts}: { posts: Post[] }): JSX.Element => {
   return (
     <Layout>
       <div>
