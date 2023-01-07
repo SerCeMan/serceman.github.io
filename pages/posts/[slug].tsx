@@ -14,7 +14,6 @@ import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 import Layout, {WEBSITE_HOST_URL} from '../../components/Layout';
 import {MetaProps} from '../../types/layout';
-import {PostType} from '../../types/post';
 import {postFilePaths, POSTS_PATH} from '../../utils/mdxUtils';
 import React from "react";
 import "@fontsource/noto-serif";
@@ -26,6 +25,7 @@ import TimeQuizChooser from "../../components/matteroftime/TimeQuizChooser";
 import CheckResults from "../../components/matteroftime/CheckResults";
 import CanvaEmbed from "../../components/CanvaEmbed";
 import Quote from "../../components/Quote";
+import {Post} from "../../lib/api";
 
 
 // Custom components/renderers to pass to MDX.
@@ -46,12 +46,12 @@ const components = {
 
 type PostPageProps = {
   source: MDXRemoteSerializeResult;
-  frontMatter: PostType;
+  frontMatter: Post;
 };
 
 const PostPage = ({source, frontMatter}: PostPageProps): JSX.Element => {
   const customMeta: MetaProps = {
-    title: `${frontMatter.title} - Hunter Chang`,
+    title: `${frontMatter.title} - Sergey Tselovalnikov`,
     description: frontMatter.description,
     image: `${WEBSITE_HOST_URL}${frontMatter.image}`,
     date: frontMatter.date,

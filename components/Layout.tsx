@@ -31,8 +31,6 @@ const Layout = ({children, customMeta}: LayoutProps): JSX.Element => {
                     {children}
                 </div>
             </main>
-            {/*<footer className="py-8">*/}
-            {/*</footer>*/}
         </>
     );
 };

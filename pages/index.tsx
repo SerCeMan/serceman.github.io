@@ -1,18 +1,16 @@
-import {format, parseISO} from 'date-fns';
 import {GetStaticProps} from 'next';
-import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
 import Layout from '../components/Layout';
-import {getAllPosts} from '../lib/api';
-import {PostType} from '../types/post';
+import {getAllPosts, Post} from '../lib/api';
 import "@fontsource/alegreya"
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faEnvelope, faUser} from "@fortawesome/free-solid-svg-icons";
 import meJpg from '../public/images/me.jpg'
+import PostList from "../components/posts/PostList";
 
 type IndexProps = {
-  posts: PostType[];
+  posts: Post[];
 };
 
 export const Index = ({posts}: IndexProps): JSX.Element => {
@@ -30,6 +28,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
               className="max-h-full min-w-[150px] rounded-full"
               src={meJpg}
               alt="Sergey Tselovalnikov"
+              priority
             />
           </div>
           <div className="col-span-7 px-2">
@@ -122,22 +121,10 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
                   className="text-2xl">Blog Posts</h3>
               </div>
               <hr/>
-              <div className="pl-10">
-                <ul className="list-disc">
-                  {posts.map((post) => (
-                    <li key={post.title}>
-                      <h4
-                        style={{
-                          fontFamily: 'Alegreya',
-                        }}
-                        className="text-lg py-1">{format(parseISO(post.date), 'MMMM dd, yyyy')}</h4>
-                      <Link as={`/posts/${post.slug}`} href={`/posts/[slug]`} legacyBehavior>
-                        {post.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <PostList
+                listClass="pl-10"
+                posts={posts}
+              />
             </div>
           </div>
         </div>
@@ -147,7 +134,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const posts = getAllPosts(['date', 'description', 'slug', 'title']);
+  const posts = getAllPosts();
 
   return {
     props: {posts},

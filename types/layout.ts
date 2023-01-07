@@ -1,7 +1,8 @@
-import { PostType } from './post';
-
-export interface MetaProps
-  extends Pick<PostType, 'date' | 'description' | 'image' | 'title'> {
+export interface MetaProps {
+  title: string,
+  description: string,
+  image: string,
+  date: string,
   /**
    * For the meta tag `og:type`
    */

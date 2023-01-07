@@ -1,42 +1,27 @@
 import React from 'react';
 import Layout from '../components/Layout';
-import {format, parseISO} from "date-fns";
-import Link from "next/link";
-import {PostType} from "../types/post";
+import {getAllPosts, Post} from "../lib/api";
 import {GetStaticProps} from "next";
-import {getAllPosts} from "../lib/api";
+import PostList from "../components/posts/PostList";
 
 type IndexProps = {
-  posts: PostType[];
+  posts: Post[];
 };
-
 
 export const Blog = ({posts}: IndexProps): JSX.Element => {
   return (
-    <Layout
-      customMeta={{
-        title: 'About - SerCe\'s blog',
-      }}
-    >
+    <Layout>
       <div>
         <div className="container max-w-5xl	mx-auto px-12 py-6 text-base">
-          <h1>Posts</h1>
-          <div className="pl-4">
-            <ul className="list-disc">
-              {posts.map((post) => (
-                <li key={post.title}>
-                  <h4
-                    style={{
-                      fontFamily: 'Alegreya',
-                    }}
-                    className="text-lg py-1">{format(parseISO(post.date), 'MMMM dd, yyyy')}</h4>
-                  <Link as={`/posts/${post.slug}`} href={`/posts/[slug]`} legacyBehavior>
-                    {post.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <h1
+            style={{
+              fontFamily: 'Alegreya',
+            }}
+            className="text-2xl font-normal">Blog Posts</h1>
+          <PostList
+            listClass="pl-4"
+            posts={posts}
+          />
         </div>
       </div>
     </Layout>
@@ -44,7 +29,7 @@ export const Blog = ({posts}: IndexProps): JSX.Element => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const posts = getAllPosts(['date', 'description', 'slug', 'title']);
+  const posts = getAllPosts();
 
   return {
     props: {posts},
