@@ -34,7 +34,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
           <div className="col-span-7 px-2">
             <p
               style={{fontFamily: "Alegreya"}}
-              className="text-6xl">Sergey Tselovalnikov</p>
+              className="text-5xl lg:text-6xl sm:text-5xl">Sergey Tselovalnikov</p>
             <p className="text-lg text-gray-800 ">
               Passionate software engineer<br/>
             </p>

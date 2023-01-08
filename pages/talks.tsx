@@ -27,8 +27,8 @@ export const Talks = ({talks}: { talks: Talk[]; }): JSX.Element => {
                       fontFamily: 'Alegreya',
                     }}
                     className="flex flex-row text-2xl gap-1 mb-2 items-center">
-                    <div>({talk.language === 'ru' ? 'RU' : 'EN'})</div>
-                    <div className="whitespace-pre-wrap">{talk.title}</div>
+                    <div>[{talk.language === 'ru' ? 'RU' : 'EN'}]</div>
+                    <div className="pl-1 whitespace-pre-wrap">{talk.title}</div>
                   </h1>
                   {talk.events.map((event) =>
                     <div key={event.name} className="flex flex-col">
