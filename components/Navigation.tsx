@@ -4,7 +4,7 @@ import "@fontsource/alegreya"
 
 const Navigation = (): JSX.Element => {
     return (
-        <nav className="flex justify-between items-center w-full text-lg">
+        <nav className="flex flow-row justify-between items-center w-full text-lg">
             <Link
                 href="/"
                 style={{
@@ -14,15 +14,17 @@ const Navigation = (): JSX.Element => {
                 SerCe&apos;s blog
             </Link>
             <div className="float-right">
-                <Link href="/" className="text-gray-600 px-6 py-4">
+              <div className="grid grid-cols-3 gap-12">
+                <Link href="/" className="text-gray-600 py-4">
                     Home
                 </Link>
-                <Link href="/blog" className="text-gray-600 px-6 py-4">
+                <Link href="/blog" className="text-gray-600 py-4">
                     Blog
                 </Link>
-                <Link href="/talks" className="text-gray-600 px-6 py-4">
+                <Link href="/talks" className="text-gray-600 py-4">
                     Talks
                 </Link>
+              </div>
             </div>
         </nav>
     );
