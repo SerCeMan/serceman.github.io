@@ -87,7 +87,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
             </h3>
             <hr/>
             <div className="p-4">
-              <p>Hi! My name is Sergey Tselovalnikov. I&apos;m a:</p>
+              <p>Hey, folks! I&apos;m a:</p>
               <ul className="list-disc text-m font-normal pl-6 pb-4">
                 <li>Software engineer at <a href="https://canva.com/about/">Canva</a></li>
                 <li>JVM platform fan</li>
