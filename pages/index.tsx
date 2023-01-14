@@ -97,7 +97,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
                 </li>
                 <li>Technology internals diver</li>
                 <li>Have a love-hate relationship with thinking about concurrency and performance</li>
-                <li>Former lead of <a href="http://jugekb.ru">JUG.EKB</a></li>
+                <li>Former lead of <a href="https://jugekb.ru">JUG.EKB</a></li>
                 <li>Love powerlifting, boxing, and mountain biking</li>
               </ul>
               <p>

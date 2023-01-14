@@ -14,7 +14,7 @@ const Navigation = (): JSX.Element => {
                 SerCe&apos;s blog
             </Link>
             <div className="float-right">
-              <div className="grid grid-cols-3 gap-12">
+              <div className="grid grid-cols-3 gap-12 text-center">
                 <Link href="/" className="text-gray-600 py-4">
                     Home
                 </Link>
