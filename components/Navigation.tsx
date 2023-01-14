@@ -7,10 +7,7 @@ const Navigation = (): JSX.Element => {
         <nav className="flex flow-row justify-between items-center w-full text-lg">
             <Link
                 href="/"
-                style={{
-                    fontFamily: 'Alegreya',
-                }}
-                className="text-gray-500 pr-6 py-4 float-left w-1/2 text-4xl">
+                className="font-[Alegreya] text-gray-500 pr-6 py-4 float-left w-1/2 text-4xl">
                 SerCe&apos;s blog
             </Link>
             <div className="float-right">

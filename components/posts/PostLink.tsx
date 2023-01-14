@@ -10,10 +10,7 @@ const PostLink = ({post}: { post: Post }): JSX.Element => {
   return (
     <div>
       <h4
-        style={{
-          fontFamily: 'Alegreya',
-        }}
-        className="text-lg py-1">{formatDate(post.date)}</h4>
+        className="font-[Alegreya] text-lg py-1">{formatDate(post.date)}</h4>
       {post.kind === "external"
         ? <Link href={post.canonicalLink}>
             <span className="flex flex-row items-center">

@@ -33,16 +33,14 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
           </div>
           <div className="col-span-7 px-2">
             <p
-              style={{fontFamily: "Alegreya"}}
-              className="text-5xl lg:text-6xl sm:text-5xl">Sergey Tselovalnikov</p>
+              className="font-[Alegreya] text-5xl lg:text-6xl sm:text-5xl">Sergey Tselovalnikov</p>
             <p className="text-lg text-gray-800 ">
               Passionate software engineer<br/>
             </p>
           </div>
           <div className="col-span-3 px-2">
             <h4
-              style={{fontFamily: "Alegreya"}}
-              className="text-lg font-light pb-3 flex flex-row flex-nowrap items-center">
+              className="font-[Alegreya] text-lg font-light pb-3 flex flex-row flex-nowrap items-center">
               <FontAwesomeIcon icon={faEnvelope} className="h-5 pr-4"/>
               Contact Information
             </h4>
@@ -78,10 +76,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
           className="grid grid-cols-1 lg:grid-cols-2 flex flex-wrap -mx-2">
           <div className="px-2">
             <h3
-              style={{
-                fontFamily: 'Alegreya',
-              }}
-              className="p-4 text-2xl flex flex-row flex-nowrap items-center ">
+              className="font-[Alegreya] p-4 text-2xl flex flex-row flex-nowrap items-center ">
               <FontAwesomeIcon icon={faUser} className="h-5 pr-4"/>
               About Me
             </h3>
@@ -114,11 +109,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
           <div className="px-4">
             <div>
               <div className="p-4">
-                <h3
-                  style={{
-                    fontFamily: 'Alegreya',
-                  }}
-                  className="text-2xl">Blog Posts</h3>
+                <h3 className="font-[Alegreya] text-2xl">Blog Posts</h3>
               </div>
               <hr/>
               <PostList
