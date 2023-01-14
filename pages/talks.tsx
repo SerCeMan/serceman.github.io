@@ -15,7 +15,7 @@ export const Talks = ({talks}: { talks: Talk[]; }): JSX.Element => {
           <div>
             <h1
               className="font-[Alegreya] text-3xl font-normal mb-3">Talks</h1>
-            Below is a list of public talks I've given at various conferences and meetups.
+            Below is a list of public talks I&apos;ve given at various conferences and meetups.
             <hr/>
             {talks.map((talk) =>
               <div className="flex flex-col mt-6" key={talk.title}>
