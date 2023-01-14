@@ -11,7 +11,7 @@ export type MdxPost = {
   kind: "mdx";
   title: string;
   date: string;
-  content: string;
+  content?: string;
   description: string;
   image?: string;
   slug: string;
@@ -28,7 +28,7 @@ export type ExternalPost = {
 
 export type Post = MdxPost | ExternalPost
 
-function getMdxPostBySlug(slug: string): MdxPost {
+function getMdxPostBySlug(slug: string, includeContent: boolean): MdxPost {
   const realSlug = slug.replace(/\.mdx$/, '');
   const fullPath = join(POSTS_PATH, `${realSlug}.mdx`);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
@@ -36,17 +36,17 @@ function getMdxPostBySlug(slug: string): MdxPost {
   return {
     title: data['title'],
     date: data['date'],
-    content: content,
+    content: includeContent ? content : null,
     description: data['description'],
     slug: realSlug,
     kind: "mdx"
   }
 }
 
-function getMdxPosts(): MdxPost[] {
+function getMdxPosts(includeContent: boolean): MdxPost[] {
   const slugs = getPostSlugs();
   return slugs
-    .map((slug) => getMdxPostBySlug(slug))
+    .map((slug) => getMdxPostBySlug(slug, includeContent))
     // sort posts by date in descending order
     .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
 }
@@ -63,8 +63,8 @@ function getExternalPosts(): ExternalPost[] {
   }]
 }
 
-export function getAllPosts(): Post[] {
-  const mdxPosts = getMdxPosts() as Post[];
+export function getAllPosts(includeContent = false): Post[] {
+  const mdxPosts = getMdxPosts(includeContent) as Post[];
   const externalPosts = getExternalPosts();
   return mdxPosts.concat(externalPosts)
     .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
