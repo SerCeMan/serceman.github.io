@@ -45,22 +45,16 @@ const CheckResults = (): JSX.Element => {
         id="checkquizres"
         className="bg-blue-500 w-full text-white rounded-full p-2 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none"
         type="button"
-        data-toggle="collapse"
-        data-target="#collapseExample"
-        aria-expanded="false"
-        aria-controls="collapseExample"
       >
         Check results
       </button>
-      <div className="collapse" id="collapseExample">
-        <div id="showquizres" className="well">
-          <p id="sqr1"></p>
-          <p id="sqr2"></p>
-          <p id="sqr3"></p>
-          <p id="sqr4"></p>
-          <p id="sqr5"></p>
-          <p id="sqr6"></p>
-        </div>
+      <div id="showquizres" className="well">
+        <p id="sqr1"></p>
+        <p id="sqr2"></p>
+        <p id="sqr3"></p>
+        <p id="sqr4"></p>
+        <p id="sqr5"></p>
+        <p id="sqr6"></p>
       </div>
     </div>
   );

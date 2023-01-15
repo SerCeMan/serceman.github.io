@@ -5,9 +5,7 @@ import {getAllTalks, Talk} from "../lib/talks";
 import Link from "next/link";
 import {formatDate} from "../utils/dates";
 
-
 export const Talks = ({talks}: { talks: Talk[]; }): JSX.Element => {
-
   return (
     <Layout>
       <div>

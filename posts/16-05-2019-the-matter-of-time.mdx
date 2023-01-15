@@ -59,7 +59,7 @@ isThisPossible(t2 - t1 == 0);
 
 <TimeQuizChooser id="q1" />
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     <span id="aq2"></span>2. Is this possible?
 
@@ -74,7 +74,7 @@ isThisPossible(t2 - t1 == 0);
 
 <TimeQuizChooser id="q2" />
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     <span id="aq3"></span>3. Is this possible?
 
@@ -90,7 +90,7 @@ isThisPossible(t2 < t1);
 <TimeQuizChooser id="q3" />
 
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     <span id="aq4"></span>4. Is this possible?
 
@@ -105,7 +105,7 @@ isThisPossible(t2 < t1);
 
 <TimeQuizChooser id="q4" />
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     <span id="aq5"></span>5. Is this possible?
 
@@ -119,7 +119,7 @@ isThisPossible(t1 < 0);
 
 <TimeQuizChooser id="q5" />
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     <span id="aq6"></span>6. Is this possible?
 
@@ -187,7 +187,7 @@ to start the exploration is the documentation written in the Javadoc,
 and there is a lot there to take in. Here is an excerpt of what is
 important to us right now.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[Javadoc](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/java.base/share/classes/java/lang/System.java#l375)_
 
@@ -227,7 +227,7 @@ implementation.
 The method is native, so the implementation depends on the underlying
 OS. The native implementation for Linux and MacOS look almost identical.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[Linux](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1204)_
 
@@ -242,7 +242,7 @@ jlong os::javaTimeMillis() {
 }
 ```
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[MacOS](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/bsd/os_bsd.cpp#l893)_
 
@@ -261,7 +261,7 @@ The functions invoke exactly the same syscall, `gettimeofday`. The man
 page can provide us with more info, but more importantly with some
 valuable notes:
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[man page](http://man7.org/linux/man-pages/man2/gettimeofday.2.html)_
 
@@ -292,7 +292,7 @@ The same exploration path can be taken for `System.nanoTime()`. Let’s
 start from the Javadoc which has even more intriguing details than the
 previous one; here is an excerpt.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[Javadoc](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/java.base/share/classes/java/lang/System.java#l394)_
 
@@ -333,7 +333,7 @@ Nano time can only be used to measure time intervals, so it ought to be
 monotonic, right? Unfortunately, the Javadoc doesn’t say anything about
 monotonicity, so the next step is the implementation.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[Linux](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1301)_
 
@@ -363,7 +363,7 @@ modern Linux server supports `CLOCK_MONOTONIC`; there are, however, some
 [rare situations](https://stackoverflow.com/a/51345008/1542319) in which
 it might not hold true.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[MacOS](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/bsd/os_bsd.cpp#l893)_
 
@@ -442,7 +442,7 @@ obtain an instance of `Instant` class which contains the number of
 seconds since the epoch and the number of nanoseconds since the last
 second started.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[JSR 310: Date and Time API](https://jcp.org/en/jsr/detail?id=310)_
 
@@ -459,7 +459,7 @@ precision, right? Not so fast, if we take a look at the implementation
 in JDK8, we’ll find out that it simply delegates straight to
 `System.currentTimeMillis()`.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[JDK8
     Clock](http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/java/time/Clock.java#l469)_
@@ -485,7 +485,7 @@ call with the following implementation on Linux. Assuming that your OS
 can provide microsecond resolution, this clock is a great example of a
 clock with nanosecond precision, but only microsecond resolution.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _[JDK9+
     Clock](http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/hotspot/os/linux/os_linux.cpp#l1211)_
@@ -564,7 +564,7 @@ it help avoid the nasty consequences of applying leap seconds naïvely,
 but it also dramatically decreases the synchronisation error since the
 network latency is typically much lower within a single datacenter.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     _AWS NTP with chrony_
 
@@ -630,19 +630,19 @@ the following algorithm.
         <col style={{width: "50%"}}/>
     </colgroup>
     <tbody>
-    <tr class="odd">
+    <tr className="odd">
         <td style={{textAlign: "left"}}><p>Sending a message</p></td>
         <td style={{textAlign: "left"}}><p>Receiving a message</p></td>
     </tr>
-    <tr class="even">
-        <td style={{textAlign: "left"}}><pre class="pseudocode">
+    <tr className="even">
+        <td style={{textAlign: "left"}}><pre className="pseudocode">
 ```
 time = time + 1;
 send(message, time);
 ```
         </pre>
         </td>
-        <td style={{textAlign: "left"}}><pre class="pseudocode">
+        <td style={{textAlign: "left"}}><pre className="pseudocode">
 ```
 (message, ts) = receive();
 time = max(ts, time) + 1;
@@ -694,19 +694,19 @@ track of the latest timestamp of any other actor in the system.
         <col style={{width: "50%"}}/>
     </colgroup>
     <tbody>
-    <tr class="odd">
+    <tr className="odd">
         <td style={{textAlign: "left"}}><p>Sending a message</p></td>
         <td style={{textAlign: "left"}}><p>Receiving a message</p></td>
     </tr>
-    <tr class="even">
-        <td style={{textAlign: "left"}}><pre class="pseudocode">
+    <tr className="even">
+        <td style={{textAlign: "left"}}><pre className="pseudocode">
 ```
 V[myId] = V[myId] + 1
 send(message, V);
 ```
         </pre>
         </td>
-        <td style={{textAlign: "left"}}><pre class="pseudocode">
+        <td style={{textAlign: "left"}}><pre className="pseudocode">
 ```
 (message, Vr) = receive();
 for (i, v) in Vr {
