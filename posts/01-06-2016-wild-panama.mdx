@@ -142,6 +142,7 @@ intrinsic without coding it in the JVM.
 Let’s compare assembly produced by the JVM after compiling and inlining
 for every method.
 
+<div class="tablediv">
 <table className="fit-table">
     <colgroup>
         <col style={{width: "33%"}}/>
@@ -231,6 +232,7 @@ runtime_call_rethrow_Java:
     </tr>
     </tbody>
 </table>
+</div>
 
 As you can see here the only difference between the C2 JIT version and
 our CodeSnippet is the movement of arguments between registers to
