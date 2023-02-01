@@ -106,7 +106,8 @@ pre {
 }
 
 .asciiprose p {
-  overflow-x: scroll;
+  /* this breaks everything */
+  /*overflow-x: scroll;*/
 }
 
 .asciiprose .formalpara-title p {
