@@ -1,7 +1,7 @@
 ---
 title: "JVM Field Guide: Memory"
 description: Empty
-date: '2023-01-19'
+date: '2023-02-01'
 ---
 
 
@@ -73,7 +73,7 @@ using this example throughout the article.
 
 <div class="formalpara-title">
 
-    **[LongRunningAlloc.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/LongRunningAlloc.java)**
+    [LongRunningAlloc.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/LongRunningAlloc.java)
 
 </div>
 
@@ -126,6 +126,7 @@ answer the question of how much memory a single program can allocate.
 Looking at the difference between the two programs below can help to
 solidify a mental model around the concept.
 
+<div class="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
@@ -181,6 +182,7 @@ int main() {
     </tr>
     </tbody>
 </table>
+</div>
 
 The program on the left can run for much longer than the second. But
 both get killed by Linux Out Of Memory (OOM) killer after running for
@@ -206,6 +208,7 @@ including the killed process info. When comparing the OOM killer
 of virtual memory and the size used for page tables — the mapping
 between virtual addresses and physical addresses.
 
+<div class="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
@@ -253,6 +256,7 @@ oom_score_adj:0
     </tr>
     </tbody>
 </table>
+</div>
 
 
 Most application monitoring tools will have RSS [included in the
@@ -285,7 +289,7 @@ example of a Java program with an evident memory leak.
 
 <div class="formalpara-title">
 
-    **[OomAlloc.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/OomAlloc.java)**
+    [OomAlloc.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/OomAlloc.java)
 
 </div>
 
@@ -315,7 +319,7 @@ What happens when the JVM runs out of memory? If you ask a java
 engineer, a common answer would be that `OutOfMemoryError` gets thrown.
 However, that’s not quite correct as it’s a trick question, and the
 right answer would be to clarify what whoever asks the question means
-when they say "`out of memory`". Let’s run the example above inside the
+when they say "out of memory". Let’s run the example above inside the
 container to observe the effects, and how the answer to the question
 changes depending on the environment.
 
@@ -507,14 +511,27 @@ the heap. One of the quickest ways to do this is to use `jmap` to get a
 histogram of all objects in heap.
 
 ``` bash
-TODO
+$ java -cp build/classes/java/main/ me.serce.LongRunningAlloc &
+[1] 13
+$ jmap -histo 13
+ num     #instances         #bytes  class name (module)
+-------------------------------------------------------
+   1:          8148      137725784  [B (java.base@17.0.5)
+   2:           137        2717992  [C (java.base@17.0.5)
+   3:           470         536784  [I (java.base@17.0.5)
+   4:           135         270704  [S (java.base@17.0.5)
+   5:          7933         190392  java.lang.String (java.base@17.0.5)
+
+...
+
+Total         25483      141949064
 ```
 
-From the output above, we can see that bytes take most of the heap. This
+From the output above, we can see that byte arrays `[B` consume most of the heap. This
 knowledge is a great clue, but in large applications, it’s often hard to
 understand which code paths lead to the creation of most of these
 arrays. Unless the histogram shows something obvious, a complete
-snapshot of the heap memory can be helpful — a heap dump.
+snapshot of the heap memory can be helpful — a heap dump.
 
 #### Collecting heap dumps
 
@@ -528,7 +545,7 @@ Heap dump file created [140656507 bytes in 0.630 secs]
 ```
 
 A heap dump is created on-demand, and now it can be analysed to
-understand a full path to the "`offensive`" code. However, most of the
+understand a full path to the "offensive" code. However, most of the
 time, it’s useful to know the state of the heap right before the error,
 not at an arbitrary point in time. And the following startup options can
 help to catch a heap dump when an OOM exception occurs.
@@ -714,7 +731,7 @@ $ java "${JAVA_OPTS[@]}" -Xmx2G -cp build/classes/java/main/ me.serce.LongRunnin
 
 After running the application for some time, you can start observing
 regular safepoint timeouts where the application is waiting for one
-specific thread - copying-thread to stop.
+specific thread – copying-thread to stop.
 
 ``` bash
 [73.509s][warning][safepoint] # SafepointSynchronize::begin: Timeout detected:
@@ -929,7 +946,7 @@ ParallelGC, and G1GC collectors, and compare the output.
 
 **Other**
 
-Other, despite one having a boring and undescriptive name, is one of the
+_Other_, despite having a boring and undescriptive name, is one of the
 most interesting sections of NMT because it includes the native memory
 allocated by byte buffers which are commonly used by a huge variety of
 network libraries.
@@ -976,11 +993,14 @@ footprint, especially if it runs in a highly constrained environment.
 
 ### JNI
 
-Despite its name, not all native allocations can be tracked with NMT.
+Despite having _Native_ in it's name, not all native allocations can be tracked with NMT.
 Specifically, NMT doesn’t report the allocations made by libraries
 linked through Java Native Interface (JNI). Let’s consider the below
-example that invokes two native methods. z
-.[NativeLib.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/nativelib/NativeLib.java)
+example that invokes two native methods.
+
+<div class="formalpara-title">
+[NativeLib.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/nativelib/NativeLib.java)
+</div>
 
 ``` java
 public class NativeLib {
@@ -1082,15 +1102,15 @@ readily available can help a great deal with running and maintaining
 JVM-based applications.
 
 This article is by no means comprehensive. It’s only a brief field
-guide. Nonetheless, I hope it might help you understand and resolve the
-typical memory issues you might face in the JVM world. And if you think
-I’ve missed some neat techniques that have helped to deal with the JVM
-memory quirks in the past, let me know, and I’ll include this in the
-field guide.
+guide. Nonetheless, I hope it might have helped you understand the typical
+memory issues you might face in the JVM world. And if you think I’ve missed
+some neat techniques that have helped to deal with the JVM memory quirks
+in the past, let me know, and I’ll include this in the field guide.
+
 
 ## Thank you to
 
-- [James Judd](https://twitter.com/Juddling) for reviewing the article.
+- [James Judd](https://twitter.com/Juddling) and [Michael Theos](https://www.linkedin.com/in/mtheos/) for reviewing the article.
 - You for reading the article.
 
 ## References
@@ -1102,5 +1122,3 @@ field guide.
 - [Heap Uncommit](https://shipilev.net/jvm/anatomy-quarks/21-heap-uncommit/)
 - [Off-Heap memory reconnaissance](https://blog.arkey.fr/2020/11/30/off-heap-reconnaissance/)
 - [NMT diff by Thomas Stuefe](https://stackoverflow.com/a/73175766/1542319)
-
-## Discuss on

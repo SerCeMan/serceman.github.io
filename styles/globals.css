@@ -101,6 +101,10 @@ pre {
   font-size: 11px;
 }
 
+.asciiprose .tablediv {
+  overflow-x: scroll;
+}
+
 .asciiprose .formalpara-title p {
   margin-bottom: 0;
   margin-top: 1em;
