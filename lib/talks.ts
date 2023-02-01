@@ -70,7 +70,7 @@ export function getAllTalks(): Talk[] {
     },
     {
       language: "ru",
-      title: "Workshop: Build Bomberman with RSocket\n(Oleh Dokuka & Sergey Tselovalnikov\n)",
+      title: "Workshop: Build Bomberman with RSocket\n(Oleh Dokuka & Sergey Tselovalnikov)",
       description: "The workshop is aimed at developers of microservices and distributed systems who are interested " +
         "in getting to know RSocket-Java and RSocket-JS closely in practice, trying different features of these " +
         "technologies, and understanding their use for building fast and fault-tolerant systems.\n" +
