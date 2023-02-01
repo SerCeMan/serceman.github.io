@@ -427,6 +427,7 @@ And as a result, GCC didn’t perform well, and we’ve got an almost
 literal translation of that we wrote in C++ to assembly. At the same
 time, JIT gave us a good unrolled loop.
 
+<div class="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
@@ -484,6 +485,7 @@ loop:
     </tr>
     </tbody>
 </table>
+</div>
 
 So, we can use -O3 if we need more optimizations.
 
@@ -512,6 +514,7 @@ emitted by JIT. Here GCC was able to vectorize our loop. So, it used
 SIMD instructions which gave our processor an ability to "parallelize"
 execution.
 
+<div class="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
@@ -580,6 +583,7 @@ loop:
     </tr>
     </tbody>
 </table>
+</div>
 
 But what if we need more performance? Can we do it better than GCC?
 

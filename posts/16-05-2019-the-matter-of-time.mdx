@@ -624,6 +624,7 @@ Leslie Lamport described the "happens before" relation and logical
 clocks that can be used to define total order for a set of events using
 the following algorithm.
 
+<div class="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
@@ -652,6 +653,7 @@ time = max(ts, time) + 1;
     </tr>
     </tbody>
 </table>
+</div>
 
 Every actor, in this case, Alice and Bob, will maintain a shared view of
 the current time by maintaining a `time` counter which increases every
@@ -688,6 +690,7 @@ concurrently. To determine partial order the following algorithm can be
 used this, where every actor has a separate time counter, and keeps
 track of the latest timestamp of any other actor in the system.
 
+<div class="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
@@ -719,6 +722,7 @@ V[myId] = V[myId] + 1;
     </tr>
     </tbody>
 </table>
+</div>
 
 The algorithm was described in 1988, and later using vector clocks for
 conflict resolution in a database was described in the Dynamo paper. On

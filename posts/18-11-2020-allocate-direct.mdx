@@ -718,6 +718,7 @@ with pre-prepared assembly code. Adding a set of JVM options,
 allows us to peek at the resulting assembly code to understand how
 exactly the `reverseBytes` affects the resulting code.
 
+<div class="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}} />
@@ -780,6 +781,7 @@ loop:
     </tr>
     </tbody>
 </table>
+</div>
 
 Comparing the compilations listings of these two implementations, we can
 notice that the biggest difference between them is the `bswap`
