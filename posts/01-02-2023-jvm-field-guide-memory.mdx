@@ -63,8 +63,7 @@ various Linux tools without any jvm awareness can give insights into
 memory usage.
 
 Let’s use a simple Java program below as a guinea pig -
-`LongRunningAlloc`. The below snippet describes pretty much the whole
-program. The program allocates 150 1M byte arrays, then drops 25 of
+`LongRunningAlloc`. The program allocates 150 1M byte arrays, then drops 25 of
 them, then allocates more until the number reaches 150 again, and
 repeats the cycle. The below snippet describes pretty much the whole
 program. By no means it represents a real workload, but it allocates
