@@ -38,6 +38,7 @@ function getMdxPostBySlug(slug: string, includeContent: boolean): MdxPost {
     date: data['date'],
     content: includeContent ? content : null,
     description: data['description'],
+    image: data['image'],
     slug: realSlug,
     kind: "mdx"
   }

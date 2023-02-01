@@ -1,6 +1,7 @@
 ---
 title: "JVM Field Guide: Memory"
-description: Empty
+description: "JVM Field Guide: Memory"
+image: '/images/jvmguide-mem/volume1.png'
 date: '2023-02-01'
 ---
 
@@ -71,7 +72,7 @@ memory, allows for it to be released, and produces a lot of garbage to
 collect, which is precisely what we need for various tests, so we’ll be
 using this example throughout the article.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     [LongRunningAlloc.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/LongRunningAlloc.java)
 
@@ -124,22 +125,22 @@ process actually used.
 The concept can be demonstrated by this timeless C example that tries to
 answer the question of how much memory a single program can allocate.
 Looking at the difference between the two programs below can help to
-solidify a mental model around the concept.
+solidify a mental model around the concept.c
 
-<div class="tablediv">
+<div className="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
         <col style={{width: "50%"}}/>
     </colgroup>
     <thead>
-    <tr class="header">
+    <tr className="header">
         <th style={{textAlign: "left"}}>Allocate</th>
         <th style={{textAlign: "left"}}>Allocate & Use</th>
     </tr>
     </thead>
     <tbody>
-    <tr class="odd">
+    <tr className="odd">
     <td style={{textAlign: "left"}}>
 <pre>
 ```c
@@ -208,20 +209,20 @@ including the killed process info. When comparing the OOM killer
 of virtual memory and the size used for page tables — the mapping
 between virtual addresses and physical addresses.
 
-<div class="tablediv">
+<div className="tablediv">
 <table>
     <colgroup>
         <col style={{width: "50%"}}/>
         <col style={{width: "50%"}}/>
     </colgroup>
     <thead>
-    <tr class="header">
+    <tr className="header">
         <th style={{textAlign: "left"}}>Allocate</th>
         <th style={{textAlign: "left"}}>Allocate & Use</th>
     </tr>
     </thead>
     <tbody>
-    <tr class="odd">
+    <tr className="odd">
     <td style={{textAlign: "left"}}>
 <pre>
 ```
@@ -287,7 +288,7 @@ However, the GC existence can’t prevent a JVM process from running out
 of heap memory; otherwise, this article wouldn’t exist. Here’s an
 example of a Java program with an evident memory leak.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 
     [OomAlloc.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/OomAlloc.java)
 
@@ -998,7 +999,7 @@ Specifically, NMT doesn’t report the allocations made by libraries
 linked through Java Native Interface (JNI). Let’s consider the below
 example that invokes two native methods.
 
-<div class="formalpara-title">
+<div className="formalpara-title">
 [NativeLib.java](https://github.com/SerCeMan/jvmfieldguide-mem/blob/master/src/main/java/me/serce/nativelib/NativeLib.java)
 </div>
 
