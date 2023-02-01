@@ -70,20 +70,20 @@ export function getAllTalks(): Talk[] {
     },
     {
       language: "ru",
-      title: "Воркшоп: Строим Бомбермена с RSocket \n(Олег Докука & Сергей Целовальников)",
-      description: "Воркшоп нацелен на разработчиков микросервисов и распределенных систем, которым интересно " +
-        "познакомиться вплотную с RSocket-Java и RSocket-JS на практике, попробовать разные фичи данных технологий " +
-        "и понять их применение для построения быстрых и отказоустойчивых систем.\n" +
+      title: "Workshop: Build Bomberman with RSocket\n(Oleh Dokuka & Sergey Tselovalnikov\n)",
+      description: "The workshop is aimed at developers of microservices and distributed systems who are interested " +
+        "in getting to know RSocket-Java and RSocket-JS closely in practice, trying different features of these " +
+        "technologies, and understanding their use for building fast and fault-tolerant systems.\n" +
         "\n" +
-        "В этом воркшопе вы встретитесь с RSocket-JS на стороне браузера и разработаете часть логики " +
-        "связанной с взаимодействием с удаленными игроками, а также промежуточным сервером. Помимо этого, " +
-        "вы создадите механизм кластеринга и шардинга, позволяющий игрокам соединятся в одном игровом пространстве. " +
-        "У вас будет возможность оценить возможность смены транспорта для достижения более эффективного " +
-        "взаимодействия между клиентом-сервером и сервером-сервером.",
+        "In this workshop, you will encounter RSocket-JS on the browser side and develop some of the logic related to " +
+        "interacting with remote players, as well as an intermediate server. You will also create a clustering and " +
+        "sharding mechanism that allows players to connect in the same game space. You will have the opportunity to " +
+        "evaluate the possibility of changing transport to achieve more efficient interaction between the " +
+        "client-server and the server-server.",
       events: [{
         name: "JPoint",
         date: "2021-04-13",
-        eventUrl: "https://live.jugru.org/video?v=Izg3iiM1NzM4ijA",
+        eventUrl: "https://live.jugru.org/en/video?v=Izg3iiM1NzM4ijA",
         recording: "https://www.youtube.com/watch?v=hF5pj9fmWOQ",
         repo: "https://github.com/rsocket/bomberman-workshop",
       }]
