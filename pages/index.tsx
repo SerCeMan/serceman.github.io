@@ -109,12 +109,13 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
           <div className="px-4">
             <div>
               <div className="p-4">
-                <h3 className="font-[Alegreya] text-2xl">Blog Posts</h3>
+                <h3 className="font-[Alegreya] text-2xl">Recent Posts</h3>
               </div>
               <hr/>
               <PostList
                 listClass="pl-10"
                 posts={posts}
+                limit={7}
               />
             </div>
           </div>
