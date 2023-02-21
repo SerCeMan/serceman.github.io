@@ -4,11 +4,11 @@
   "license": "MIT",
   "version": "1.0.0",
   "scripts": {
-    "init": "next telemetry disable",
-    "dev": "next dev",
-    "build": "next build",
-    "export": "next export -o docs",
-    "start": "next start",
+    "init": "NEXT_TELEMETRY_DISABLED=1 next telemetry disable",
+    "dev": "NEXT_TELEMETRY_DISABLED=1 next dev",
+    "build": "NEXT_TELEMETRY_DISABLED=1 next build",
+    "export": "NEXT_TELEMETRY_DISABLED=1 next export -o docs",
+    "start": "NEXT_TELEMETRY_DISABLED=1 next start",
     "type-check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx --ext js"
   },
