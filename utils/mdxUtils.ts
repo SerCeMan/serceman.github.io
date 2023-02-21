@@ -9,3 +9,7 @@ export const postFilePaths = fs
   .readdirSync(POSTS_PATH)
   // Only include md(x) files
   .filter((path) => /\.mdx?$/.test(path));
+
+export const postUrlPaths = postFilePaths
+  // Remove file extensions for page paths
+  .map((path) => path.replace(/\.mdx?$/, ''))

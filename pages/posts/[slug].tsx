@@ -12,9 +12,9 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeCodeTitles from 'rehype-code-titles';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
-import Layout, {WEBSITE_HOST_URL} from '../../components/Layout';
+import Layout from '../../components/Layout';
 import {MetaProps} from '../../types/layout';
-import {postFilePaths, POSTS_PATH} from '../../utils/mdxUtils';
+import {POSTS_PATH, postUrlPaths} from '../../utils/mdxUtils';
 import React from "react";
 import "@fontsource/noto-serif";
 import rehypeHighlight from "rehype-highlight";
@@ -27,6 +27,7 @@ import CheckResults from "../../components/matteroftime/CheckResults";
 import CanvaEmbed from "../../components/CanvaEmbed";
 import Quote from "../../components/Quote";
 import {Post} from "../../lib/posts";
+import {WEBSITE_HOST_URL} from "../../lib/paths";
 
 
 // Custom components/renderers to pass to MDX.
@@ -120,9 +121,7 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = postFilePaths
-    // Remove file extensions for page paths
-    .map((path) => path.replace(/\.mdx?$/, ''))
+  const paths = postUrlPaths
     // Map the path into the static paths object required by Next.js
     .map((slug) => ({params: {slug}}));
 
