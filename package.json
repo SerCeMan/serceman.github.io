@@ -1,8 +1,9 @@
 {
-  "name": "nextjs-typescript-mdx-blog",
-  "author": "@hunterhchang",
-  "license": "MIT",
+  "name": "serce-blog",
+  "author": "Sergey Tselovalnikov",
+  "license": "CC-BY-4.0",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "init": "NEXT_TELEMETRY_DISABLED=1 next telemetry disable",
     "dev": "NEXT_TELEMETRY_DISABLED=1 next dev",
