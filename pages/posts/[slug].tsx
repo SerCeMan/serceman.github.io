@@ -29,6 +29,7 @@ import Quote from "../../components/Quote";
 import {Post} from "../../lib/posts";
 import {WEBSITE_HOST_URL} from "../../lib/paths";
 import {SubscribeForm} from "../../components/subscriptions/SubscribeForm";
+import {AUTHOR_NAME} from "../../utils/author";
 
 
 // Custom components/renderers to pass to MDX.
@@ -65,7 +66,7 @@ const PostPage = ({source, frontMatter}: PostPageProps): JSX.Element => {
       <article
         className="container mx-auto mt-12 px-10 py-8 shadow-md bg-white max-w-5xl flex flex-col">
         <p className="self-start text-sm text-gray-500">
-          {format(parseISO(frontMatter.date), 'dd MMMM yyyy')}
+          By {AUTHOR_NAME} on {format(parseISO(frontMatter.date), 'dd MMMM yyyy')}
         </p>
         <div
           className="asciiprose">

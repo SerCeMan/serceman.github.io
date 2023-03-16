@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faEnvelope, faUser} from "@fortawesome/free-solid-svg-icons";
 import meJpg from '../public/images/me.jpg'
 import PostList from "../components/posts/PostList";
+import {AUTHOR_NAME} from "../utils/author";
 
 type IndexProps = {
   posts: Post[];
@@ -33,7 +34,7 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
           </div>
           <div className="col-span-7 px-2">
             <p
-              className="font-[Alegreya] text-5xl lg:text-6xl sm:text-5xl">Sergey Tselovalnikov</p>
+              className="font-[Alegreya] text-5xl lg:text-6xl sm:text-5xl">{AUTHOR_NAME}</p>
             <p className="text-lg text-gray-800 ">
               Passionate software engineer<br/>
             </p>

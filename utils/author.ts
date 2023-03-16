@@ -1,0 +1,1 @@
+export const AUTHOR_NAME = 'Sergey Tselovalnikov';
