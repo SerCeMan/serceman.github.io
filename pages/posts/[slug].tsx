@@ -28,6 +28,7 @@ import CanvaEmbed from "../../components/CanvaEmbed";
 import Quote from "../../components/Quote";
 import {Post} from "../../lib/posts";
 import {WEBSITE_HOST_URL} from "../../lib/paths";
+import {SubscribeForm} from "../../components/subscriptions/SubscribeForm";
 
 
 // Custom components/renderers to pass to MDX.
@@ -72,6 +73,7 @@ const PostPage = ({source, frontMatter}: PostPageProps): JSX.Element => {
             {frontMatter.title}
           </h1>
           <MDXRemote {...source} components={components}/>
+          <SubscribeForm/>
         </div>
       </article>
     </Layout>
