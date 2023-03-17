@@ -1,12 +1,14 @@
 import {useState} from "react";
 
 export const SubscribeForm = () => {
-  const [status, setStatus] = useState<string | null>(null)
+  const [status, setStatus] = useState<"SUCCESS" | "ERROR" | null>(null)
   const [email, setEmail] = useState("")
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     const data = new FormData(event.target as HTMLFormElement)
+    data.set("token", "");
+    data.set("referrer", "");
     try {
       const FORM_URL = 'https://app.convertkit.com/forms/4951413/subscriptions'
       const response = await fetch(FORM_URL, {
