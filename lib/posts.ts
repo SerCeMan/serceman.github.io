@@ -3,8 +3,6 @@ import matter from 'gray-matter';
 import {join} from 'path';
 import {POSTS_PATH} from '../utils/mdxUtils';
 import {WEBSITE_HOST_URL} from "./paths";
-import {valid} from "semver";
-import {ca} from "date-fns/locale";
 
 export function getPostSlugs(): string[] {
   return fs.readdirSync(POSTS_PATH);
