@@ -1,4 +1,7 @@
-import {useState} from "react";
+import React, {useState} from "react";
+import Link from "next/link";
+import {faRss} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export const SubscribeForm = () => {
   const [status, setStatus] = useState<"SUCCESS" | "ERROR" | null>(null)
@@ -35,7 +38,7 @@ export const SubscribeForm = () => {
   return (
     <div>
       <h2>
-        Subscribe to new posts
+        Subscribe
       </h2>
       {status === "SUCCESS" && (
         <div>
@@ -54,10 +57,11 @@ export const SubscribeForm = () => {
       )}
       {status === null && (
         <div>
-          <div>
-            <p>
-              I&apos;ll be sending an email every time I publish a new post.
-            </p>
+          <p>
+            I&apos;ll be sending an email every time I publish a new post.
+          </p>
+          {/* It'd be great to learn why tailwind's pb-1 doesn't work in this case */}
+          <div style={{paddingBottom: "1em"}}>
             <form onSubmit={handleSubmit}>
               <div className="max-w-sm space-x-2 mx-auto p-1 pr-0 flex items-center">
                 <input type="email"
@@ -75,6 +79,11 @@ export const SubscribeForm = () => {
               </div>
             </form>
           </div>
+          <p>
+            Or, subscribe with <Link href={"/feed.xml"}>
+            RSS<FontAwesomeIcon icon={faRss} className="h-3.5 pl-1"/>
+          </Link>.
+          </p>
         </div>
       )}
     </div>

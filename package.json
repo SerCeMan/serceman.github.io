@@ -40,6 +40,7 @@
     "eslint-config-next": "^13.2.4",
     "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-react": "^7.32.2",
+    "feed": "^4.2.2",
     "next-sitemap": "^4.0.5",
     "postcss": "^8.4.20",
     "rehype": "^12.0.1",

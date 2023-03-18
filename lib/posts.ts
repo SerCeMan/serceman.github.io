@@ -2,6 +2,9 @@ import fs from 'fs';
 import matter from 'gray-matter';
 import {join} from 'path';
 import {POSTS_PATH} from '../utils/mdxUtils';
+import {WEBSITE_HOST_URL} from "./paths";
+import {valid} from "semver";
+import {ca} from "date-fns/locale";
 
 export function getPostSlugs(): string[] {
   return fs.readdirSync(POSTS_PATH);
@@ -24,6 +27,39 @@ export type ExternalPost = {
   description: string;
   image?: string;
   canonicalLink: string,
+}
+
+export function getCanonicalURL(post: Post): string {
+  const kind = post.kind;
+  let url: string;
+  if (kind === "mdx") {
+    url = `${WEBSITE_HOST_URL}/posts/${post.slug}`;
+  } else if (post.kind === "external") {
+    url = post.canonicalLink
+  } else {
+    throw Error("unexpected post kind: " + kind)
+  }
+  return validateURL(url);
+}
+
+export function getCanonicalImageURL(post: Post): string | null {
+  const kind = post.kind;
+  if (kind === "mdx") {
+    return validateURL(`${WEBSITE_HOST_URL}${post.image}`);
+  } else if (post.kind === "external") {
+    return null
+  } else {
+    throw Error("unexpected post kind: " + kind)
+  }
+}
+
+function validateURL(url: string) {
+  try {
+    new URL(url);
+  } catch (e) {
+    throw Error("Invalid URL: '" + url + "', reason: " + e.message)
+  }
+  return url;
 }
 
 export type Post = MdxPost | ExternalPost

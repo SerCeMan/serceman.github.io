@@ -3,13 +3,13 @@ import {useRouter} from 'next/router';
 import React from 'react';
 import {MetaProps} from '../types/layout';
 import {WEBSITE_HOST_URL} from "../lib/paths";
+import {BLOG_DESCRIPTION, BLOG_TITLE} from "../utils/author";
 
 const Head = ({customMeta}: { customMeta?: MetaProps }): JSX.Element => {
   const router = useRouter();
   const meta: MetaProps = {
-    title: "SerCe's blog",
-    description: 'SerCe\'s blog: Here is my personal blog where I share my ' +
-      'thoughts and experiences with different technologies.',
+    title: BLOG_TITLE,
+    description: BLOG_DESCRIPTION,
     type: 'website',
     ...customMeta,
   };

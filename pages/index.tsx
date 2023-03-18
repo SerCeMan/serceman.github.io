@@ -9,6 +9,7 @@ import {faEnvelope, faUser} from "@fortawesome/free-solid-svg-icons";
 import meJpg from '../public/images/me.jpg'
 import PostList from "../components/posts/PostList";
 import {AUTHOR_NAME} from "../utils/author";
+import {generateRss} from "../lib/generateRss";
 
 type IndexProps = {
   posts: Post[];
@@ -127,6 +128,12 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
+  // The below is an hack that I borrowed and I don't like at all. What happens
+  // is that every time getStaticProps is called, public/feed.xml is emitted.
+  // Instead, I should find a way to do it build-time. However, given that it
+  // takes less than 10ms, I might only do it when I migrate away from nextjs.
+  await generateRss();
+
   const posts = getAllPosts();
 
   return {
