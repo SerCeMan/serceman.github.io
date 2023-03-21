@@ -1,0 +1,87 @@
+---
+title: "Write Predictable software, not Ergonomic"
+description: "This article is the first chapter of a concise field guide for running and supporting JVM applications, focusing on memory. The guide focuses on the most practical aspects of dealing with JVM applications, primarily server-side ones."
+image: '/images/predictable-software/hamilton.png'
+date: '2023-03-21'
+---
+
+import Quote from "../components/Quote";
+
+As software engineers, when we build software, we often choose the configuration defaults that our language or the framework provides to us. And most of the time, the default options work well. At least for a while, until something unexpected happens that reveals that the configuration which has been in place for years can cause an outage under specific circumstances.
+
+In this article, I’ll go over a few examples illustrating the issues arising from misconfiguration. I also suggest a mental model and an API style that can help reason about configuration more effectively.
+
+![Hamilton](/images/predictable-software/hamilton.png)
+
+<Quote
+    quote="I'd rather be divisive than indecisive. Drop the niceties."
+    attribution="Lin Manuel Miranda, Alexander Hamilton"
+/>
+
+## When Ergonomic Approach Fails
+
+Let’s start with a simple example. Many Java applications need a database connection pool that maintains a certain amount of open connections to avoid the need to re-open them every time to serve a request. To create one, an engineer might use HikariCP, one of the best options out there. A common way to create a pool could be to write these two lines.
+
+```java
+var config = new HikariConfig();
+var pool = new HikariDataSource(config);
+```
+
+A careful reader might ask, but how many connections does it create? Wouldn't it be dangerous if it was limitless? The default of HikariCP is pretty safe. Luckily, it’s not unlimited. Only up to 10 connections will be maintained in the pool. Now, let’s say it’s pretty common for a single application instance to process 32 requests concurrently, so we set the pool size to 32.
+
+```java
+var config = new HikariConfig();
+var pool = new HikariDataSource(config);
+pool.setMaximumPoolSize(32);
+```
+
+The above looks like a very typical configuration. As you can see, we set a maximum size for the pool, not a fixed size. The actual number of connections will typically be below the pool's maximum size.
+
+This behaviour is very common for various connection pools. It can be described as ergonomic. Ergonomic here effectively means that the application isn’t consuming more resources than it needs to.
+
+The configuration would likely work perfectly fine for a long time until that unfortunate event that always happens sooner or later. You see, the application may become a lot more popular over time, so the number of application instances can increase too. Suddenly, a very uncommon event can make the DB respond much slower. In this case, the application's natural reaction is to grow the connection pool, and I guess you already see where the narrative is going. If every single application hits the limit, chances are, the database wouldn’t be able to handle this number of connections at all.
+
+A limit is only truly safe if it’s been tested and has shown to be safe. Otherwise, it is effectively equivalent to having no limit at all. And in the case of ergonomic APIs, the limits are often only tested when a fault occurs somewhere in the system.
+
+DB connection pools are just a single example. Plenty of configuration APIs try to be ergonomic: various caching thread pools, HTTP client connection pools, and even the way JVM allocates memory are often ergonomic by default.
+
+## The tradeoff of being ergonomic
+
+Being explicit in your configuration instead of choosing an ergonomic approach gives you an important property - predictability. Variable parameters drastically increase the number of states your application can be in. Even if we only consider *X* possible numbers of threads, *Y* connections, and *Z* megabytes of RAM your app is consuming, the number of states your app can be in is *X*Y*Z*, while when they’re all fixed, there is just one state. The engineer who will investigate the next incident will thank you for not having to understand what happened by looking at hundreds of graphs.
+
+Considering the above, it’s easy to make a case that ergonomic APIs are bad. However, the reality is not as black and white, and not all software is built to run in the same environment. Ergonomic behaviour is a very desirable property when the underlying resources are shared between heterogeneous tasks. The most common example of this would be the device from which you’re reading this article. Whether it’s a laptop, a desktop, or a mobile device – it’s a single CPU, and a single memory space all shared by different applications, where each app is better off releasing the resources it doesn’t need as quickly as possible. Another example would be a server that runs many different applications inside that share no common downstream dependencies. The fewer resources the applications consume, the more you can fit in. In these contexts, being ergonomic is vital.
+
+Where this breaks down is in the cases where a fixed capacity has already been allocated, which is a common case for many apps running in the cloud. If you provision a conventional SQL database, you’ll pay a fixed monthly price for its compute even if it is idle most of the time. There is no benefit in being ergonomic here. There is no point in keeping resources that have been pre-purchased idle, and there is a chance that being ergonomic here will lead to a minor fault escalating to a catastrophic failure.
+
+The same goes for the memory usage example. If you’ve pre-allocated a limit of 2GB RAM to your app anyways, using 500Mb most of the time, and completely crashing when you start consuming more memory under load isn’t the best strategy.
+
+## Safer configuration APIs
+
+So, really, the answer to whether it’s a good default depends on the type of software you’re building. And ideally, the APIs would be explicit about giving you the choice. Unfortunately, in most APIs, the choice is implicit.
+
+The issue with how many APIs are designed is that they make it harder to opt-in for predictable behaviour. Let's consider the connection pool example again. Setting max while omitting min rarely makes sense, yet that’s how many APIs work. If you want to make your application predictable, you often have to configure max to the same value as min - something that’s very easy to overlook.
+
+Instead, an API could make you, the user, explicitly opt-in for either ergonomic or predictable behaviour by asking you to specify a range of values or a single fixed value.
+
+```java
+// dangerous API
+setMin(int min) {...}
+setMax(int max) {...}
+
+// safe API
+setFixed(int num) {...}
+setRange(int min, int max) {...}
+```
+
+A safe API that follows the above patterns forces you to consider the environment in which your software will be running and helps to make an appropriate choice. When the *setMaximumPoolSize* example from the beginning of the article is rewritten in this paradigm, it switches from an ambiguous statement into a line that clearly signals its intention.
+
+## Conclusion
+
+Not all software is built to run in the same environment. As always, it’s a tradeoff, and you, as an engineer, control which side of the tradeoff your software is on. If you’re like me, working on applications that run in the cloud and often consume pre-provisioned capacity, chances are you should write predictable software, not ergonomic.
+
+Looking at available APIs through the prism of being ergonomic vs predictable can help to make sure that your software is properly equipped to run in the chosen environment. If you're an API designer, then slight changes to the API's shape can help provide safety to your users in the long run by deliberately nudging them to make a choice and choose the option that's right for them.
+
+## Thank you
+
+- [Paul Tune](https://twitter.com/ptuls) and [James Judd](https://twitter.com/Juddling) for reviewing the article.
+- You for reading the article.
