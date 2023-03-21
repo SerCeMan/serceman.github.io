@@ -35,9 +35,7 @@ var pool = new HikariDataSource(config);
 pool.setMaximumPoolSize(32);
 ```
 
-The above looks like a very typical configuration. As you can see, we set a maximum size for the pool, not a fixed size. The actual number of connections will typically be below the pool's maximum size.
-
-This behaviour is very common for various connection pools. It can be described as ergonomic. Ergonomic here effectively means that the application isn’t consuming more resources than it needs to.
+The above looks like a very typical configuration. As you can see, we set a maximum size for the pool, not a fixed size. The actual number of connections will typically be below the pool's maximum size. This behaviour is very common for various connection pools. It can be described as ergonomic. Ergonomic here effectively means that the application isn’t consuming more resources than it needs to.
 
 The configuration would likely work perfectly fine for a long time until that unfortunate event that always happens sooner or later. You see, the application may become a lot more popular over time, so the number of application instances can increase too. Suddenly, a very uncommon event can make the DB respond much slower. In this case, the application's natural reaction is to grow the connection pool, and I guess you already see where the narrative is going. If every single application hits the limit, chances are, the database wouldn’t be able to handle this number of connections at all.
 
