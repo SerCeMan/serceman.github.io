@@ -1,0 +1,79 @@
+---
+title: "Platform Engineering in the era of LLMs"
+description: "This article discusses how platform engineers can adapt their engineering environment to maximize the potential benefits of large language models (LLMs) in software development."
+image: '/images/jvmguide-mem/volume1.png'
+date: '2023-04-26'
+---
+
+
+If you’ve been following the news in the last few months, you know that the large language models (LLMs) have taken the world by storm. Numerous articles on the internet show how software engineers can use LLMs in their day-to-day work to increase their productivity. It won't be long before the majority of software engineers internalise those tools and use them in their day-to-day workflows.
+
+In many organisations, platform engineers focus on creating efficient and reliable platforms for product engineers to build upon. As product engineers start rapidly adopting LLM-based tools it's essential for us, as platform engineers, to look at how we can be force multipliers to ensure they get the maximum benefit from using LLMs. As a platform engineer myself, I've been thinking about this topic a lot.
+
+In this article, I'll discuss the areas where platform engineers can put in some effort to ensure that their product engineering colleagues can harness the full potential of AI tools, particularly LLMs, for maximum productivity.
+
+![](/images/platform-llms/gilfoyle.jpeg)
+
+<Quote
+    quote="If the rise of an all-powerful artificial intelligence is inevitable, well, it stands to reason that when they take power, our digital overlords will punish those of us who did not help them get there."
+    attribution="Gilfoyle"
+/>
+
+## Build empathy
+
+After using ChatGPT almost daily for a few months, I've become a believer. I believe that AI will radically change software engineering and make each of us much more productive than before. There are plenty of articles on the internet showcasing the power of LLMs, here's just [one example](https://martinfowler.com/articles/2023-chatgpt-xu-hao.html).
+
+However, not everyone shares this belief. Reading through comments on Hacker News, many follow the theme, "Oh, I tried it; it's not as good as others say." It's useful to maintain a healthy dose of skepticism, but for us as platform engineers, understanding why others find it useful is incredibly valuable. Using the same tools and seeing their impact is crucial for building empathy and understanding the value proposition. Like with all other areas, it’s simply not possible to enable something without a good understanding of what it is that we’re trying to enable.
+
+And once you’ve learned the value yourself, note that the most fascinating part isn't just the quality of these tools today but the rate at which they're improving. The tools available today are better than they were yesterday, and yesterday's tools were better than the ones from the day before.
+
+### Understand the current state
+
+ChatGPT works amazingly well for the tasks that have a large number of examples in a training data. It’s incredibly powerful at data manipulations tasks where the main goal is to call an API, obtain the result, modify it in some way, and then call another API. Remember, code is data that has an interitent structure, and so migrating from one framework to another – whether it’s a new CSS library, or a new RPC framework can be greatly accelerated by ChatGPT.
+
+However, it’s not as powerful yet with tasks that had a very limited set of examples in its training data. When I was faced with a very obscure issue with the codebase of an IntelliJ IDEA plugin that I maintain – unsurprisingly, it wasn’t that helpful at all. And this is something that’s likely to happen with any large closed-source environment. ChatGPT knows nothing about your codebase. This issue of “closed source environment” and private data is likely to be the main issues companies that work on closed-source codebases are going to face.
+
+In this article, I’ll assume that in a year, this problem will be solved from both, the security & privacy perspective, and the data access perspective with either fine-tuning, or semantic search, or maybe the context window will soon be large enough to fit anything. Instead, I’ll focus on how the platform itself needs to change to become LLM-friendly.
+
+## Enable LLMs
+
+Let’s consider the likely scenario in which ChatGPT or any other LLM gains access to the developer environment – the source code, the issue tracker, all accessible documentation. How helpful it can be will not only depend on the quality of the LLM itself, but also on the developer environment. Undoubtedly in some environments, LLMs are going to be much more useful than in others.
+
+As our goal is to enable efficient use of LLM-based tools, let’s consider a few areas in which we can make change to make the environment more LLM-friendly.
+
+### Build Writing Culture
+
+Consider two companies – the first one is Nuts, and the second one is Bolts. At Nuts, when an engineer wants to build a new feature, they schedule a meeting to discuss it and make a decision. If the decision isn't made in time, another meeting is scheduled. Whenever there's a problem or an integration concern, engineers get together either in person or virtually on Zoom, make a decision, and move on.
+
+At Bolts, a new feature starts with an RFC document, where all parties leave comments. The document is adjusted based on everyone's feedback until a decision is made. If there's a hiccup, it's discussed through messages or emails until the issue is resolved. Nuts and Bolts illustrate the extreme examples of differences between written culture and oral culture. Most companies aren't at opposite ends of this spectrum but rather sit somewhere in between on the scale from Nuts to Bolts.
+
+For LLMs to be useful, they need data. In a company with a primarily oral culture, there's a limited amount of data LLMs can rely on to find answers. In contrast, in a company with a written culture, LLMs can thrive as they have access to historical context, the decision-making process, as well as the in-depth explanations that would otherwise be inaccessible to LLMs.
+
+### Choose OSS whenever possible
+
+LLMs can't explore the code they have no access to. It's hard for me to imagine a vendor providing a closed-source SDK being successful in a world where LLM-based tools are ubiquitous. Anything that limits access to the open-source implementation or the number of examples on the internet reduces the quality of the results you'll obtain from an LLM.
+
+It's likely that your own codebase is closed source, and that's okay. As discussed before, most organisations will find a way to allow LLMs access to this environment, either through clicking a button in GitHub or using self-hosted tools. However, if your vendor's codebase is closed, there isn't much you can do. You can’t let LLM access something you have no access to yourself.
+
+Additionally, LLMs might make previously ignored debugging techniques possible! We, humans, can’t always manually scour through the code of a vendor dependency – whether it’s a huge library or maybe a code of a database, resorting to contacting support instead. But a machine never rests, and LLM-assisted debugging of vendor source code, instead of relying on support for something, suddenly becomes much more feasible.
+
+### Ensure consistency
+
+A new engineer on your team is assigned a task. To accomplish it, they need to obtain a user through the user service API and then fetch all the user's past and present subscriptions from the subscription service API. The question is: how many ways are there to achieve this in your codebase? How many different coding styles are the existing examples written in? How many languages are used?
+
+Maintaining consistency can help ensure that LLMs will effectively learn the concepts from the codebase, identify patterns, and provide relevant suggestions. Consistent coding standards make it easier for the LLMs to identify patterns and generate useful code snippets that are consistent with the codebase’s code-style.
+
+### Maintain knowledge management systems
+
+Now let's address the elephant in the room. Knowledge management systems where most of the documentation is stored can likely be the primary source of data for LLMs to access. Their usefulness will greatly depend on how well-maintained they are. If a knowledge management system contains relevant and up-to-date information, that's great. However, if it's completely outdated, then this is precisely what you'll see when you ask an LLM a question.
+
+## Conclusion
+
+I believe that making your engineering environment LLM–friendly is something platform engineers in large organisations need to actively work on today. This will ensure that when powerful LLM-based engineering assistance becomes available, engineers can use those tools to the full extent.
+
+In this article, I've tried to take a step back and identify the areas where focusing our efforts will be most impactful in harnessing the power of LLM tools. What I've written above is just an educated guess or a prediction, and maybe in a year or two, we'll see whether it holds true. Most of this advice is relevant regardless, even if it’s easier said than done, and you won't waste your time following it. And chances are that in a year, you'll see great benefits. If your opinion differs or you can think of anything that I missed, please let me know, as I'd like to hear other points of view.
+
+## Thank you to
+
+- [Paul Tune](https://twitter.com/ptuls) and [Guy Needham](https://www.linkedin.com/in/guy-needham-076b1a3b/) for reviewing the article.
+- You for reading the article.
