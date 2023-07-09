@@ -20,6 +20,8 @@ const Head = ({customMeta}: { customMeta?: MetaProps }): JSX.Element => {
       <meta content={meta.description} name="description"/>
       <meta property="og:url" content={`${WEBSITE_HOST_URL}${router.asPath}`}/>
       <link rel="canonical" href={`${WEBSITE_HOST_URL}${router.asPath}`}/>
+      <link rel="alternate" type="application/rss+xml" title={`${meta.title} RSS Feed`}
+            href={`${WEBSITE_HOST_URL}/feed.xml`}/>
       <meta property="og:type" content={meta.type}/>
       <meta property="og:site_name" content={meta.title}/>
       <meta property="og:description" content={meta.description}/>
