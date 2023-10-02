@@ -25,6 +25,25 @@
   line-height: 1.6em;
 }
 
+/** TODO: move me */
+
+@font-face {
+  font-family: 'FontogenLazyDog1';
+  src: url('/fonts/fontogen/bold_sans.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'FontogenLazyDog2';
+  src: url('/fonts/fontogen/italic_serif_79747.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'FontogenLazyDog3';
+  src: url('/fonts/fontogen/techno,_sci-fi,_extrabold_84248.ttf') format('truetype');
+}
+
+/** end to do*/
+
 /* Post styles */
 
 .anchor:hover {
@@ -857,6 +876,7 @@ pre {
 .asciiprose pre > code {
   line-height: 1.45;
   margin-bottom: 1.25em;
+  margin-top: 1.25em;
   color: rgba(0, 0, 0, 0.9);
   font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
   font-weight: 400;

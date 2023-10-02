@@ -30,6 +30,7 @@ import {Post} from "../../lib/posts";
 import {WEBSITE_HOST_URL} from "../../lib/paths";
 import {SubscribeForm} from "../../components/subscriptions/SubscribeForm";
 import {AUTHOR_NAME} from "../../utils/author";
+import ImageWithCaption from "../../components/ImgWithCaption";
 
 
 // Custom components/renderers to pass to MDX.
@@ -39,6 +40,7 @@ import {AUTHOR_NAME} from "../../utils/author";
 const components = {
   Head,
   Image,
+  ImageWithCaption,
   Link,
   TweetEmbed,
   Quote,
