@@ -87,20 +87,17 @@ export const Index = ({posts}: IndexProps): JSX.Element => {
               <p>Hey, folks! I&apos;m a:</p>
               <ul className="list-disc text-m font-normal pl-6 pb-4">
                 <li>Software engineer at <a href="https://canva.com/about/">Canva</a></li>
-                <li>JVM platform fan</li>
+                <li>Big fan of JVM</li>
                 <li>Functional programming enthusiast</li>
-                <li>Have written many lines of Java, Kotlin, Clojure, Typescript, and even
-                  ClojureScript
-                </li>
+                <li>Survivor of many debugging sessions of Java, Kotlin, Clojure, TypeScript, and even ClojureScript</li>
                 <li>Technology internals diver</li>
-                <li>Have a love-hate relationship with thinking about concurrency and performance</li>
-                <li>Former lead of <a href="https://jugekb.ru">JUG.EKB</a></li>
-                <li>Love powerlifting, boxing, and mountain biking</li>
+                <li>An occasional conference speaker and a former lead of <a href="https://jugekb.ru">JUG.EKB</a></li>
+                <li>Engineer entwined in a love-hate relationship with the nuances of concurrency and performance.</li>
+                <li>Powerlifting and mountain biking enthusiast</li>
               </ul>
               <p>
                 I believe that it is vital to understand the whole stack of technologies you use from
-                top to
-                bottom.
+                top to bottom.
               </p>
               <p>
                 Here is my personal blog where I share my thoughts and experiences with different
