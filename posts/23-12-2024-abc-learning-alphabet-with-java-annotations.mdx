@@ -1,0 +1,84 @@
+---
+title: "ABC: Learning Alphabet with Java Annotations"
+description: "This Christmas, let's explore the alphabet of Java annotations. There are so many, but how many of them truly benefit us?"
+image: '/images/alphabet/gruncle.jpg'
+date: '2024-12-23'
+---
+
+import CapitalLetter from "../components/alphabet/CapitalLetter";
+import Quote from "../components/Quote";
+
+Hi, kids, old and young! This Christmas, a couple of friends of mine are visiting me with their little one, Jackie. Jackie is young but is already good at mastering the alphabet. Naturally, I decided to prepare this article to help Jackie step up her game during Christmas. After all, nothing says “Christmas spirit” quite like learning the alphabet through Java annotations, right?
+
+So, welcome to this Christmas special blog, and I hope that you can empathise with Jackie or his Grunkle Sergey and enjoy the read!
+
+![](../images/alphabet/gruncle.jpg)
+
+<Quote
+    quote="You never stop growing up. There’s always something new to learn."
+    attribution="Grunkle Stan"
+/>
+
+### Hi, Jackie! 👋
+
+I know you love magic – the worlds of elves, orcs, and dragons. Your Uncle Sergey loves those things too. But here’s the thing – he doesn’t quite like it when the real world and the magical world mix. And as magic is just a sufficiently large number of abstraction layers, it is sometimes part of his job to make this technology sufficiently less advanced so that magic doesn’t feel like magic anymore.
+
+Now, Jackie, I know you’re just starting to master the alphabet, but you already know your Java basics, right? After all, your parents are excellent software engineers. So, let’s take you on a journey through the land of Java annotations, one letter at a time.
+
+<CapitalLetter letter={"A"}/> is for [`@Autowired`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/beans/factory/annotation/Autowired.html). This sounds so convenient, Jackie. You just add an annotation, and all fields in your class get [magically initialised](https://stackoverflow.com/a/31766429/1542319). But where do the values come from?
+
+<CapitalLetter letter={"B"}/> is for [`@Bean`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/context/annotation/Bean.html). Aha, so this is where the values are come from. Maybe we just need to find a method annotated with `@Bean`. Okay, Jackie, you can go and play with `@Bean` construction, but only after you read and understand everything that's [written](https://docs.spring.io/spring-framework/reference/core/beans/definition.html) here.
+
+<CapitalLetter letter={"C"}/> is for [`@Component(Scan)`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/context/annotation/ComponentScan.html). Maybe, but if there is no such method, then the value comes from somewhere else. Yes, you can also change the entire behaviour of the program by adding a class with the annotation somewhere in your codebase. When it's done automagically, it's a step too far, and I'm not the [only one](https://news.ycombinator.com/item?id=26486649) who thinks that way.
+
+<CapitalLetter letter={"D"}/> is for [`@Deprecated`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Deprecated.html). Now, here’s an annotation that doesn’t make Uncle Sergey sad! It doesn’t introduce any magic. Instead, it communicates information about a piece of program structure in a consistent way, allowing you to act on it programmatically without necessarily affecting runtime behaviour. Adding [`forRemoval`](https://openjdk.org/jeps/277) in Java 9 has made it even more useful.
+
+<CapitalLetter letter={"E"}/> is for [`@Email`](https://jakarta.ee/specifications/bean-validation/3.0/apidocs/jakarta/validation/constraints/Email.html). These days, Jackie, none of your friends use emails anymore. Yet they are ubiquitous. Sometimes, you just don’t want to know which of [those regexes](https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression) was used for email validation. Until you do. At least, I haven't seen [@HTML](https://stackoverflow.com/a/1732454/1542319) yet.
+
+<CapitalLetter letter={"F"}/> is for [`@FunctionalInterface`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/FunctionalInterface.html). Your Uncle Sergey is on the fence about this one. Yes, it is just metadata, but is this metadata ever useful? I guess an additional compile-time check doesn't hurt if you're building a library.
+
+<CapitalLetter letter={"G"}/> is for [`@Generated`](https://docs.oracle.com/en/java/javase/21/docs/api/java.compiler/javax/annotation/processing/Generated.html). Jackie, sometimes we grown-ups write code that writes code. Ideally, it should follow the same style guide, formatting rules, and checks as everything else. But hey, we can’t rewrite the generator for everyone’s codebase, so at least we know how to disable checks for these classes if we can guarantee their safety by construction.
+
+<CapitalLetter letter={"H"}/> is for [`@HeaderParam`](https://jakarta.ee/specifications/restful-ws/3.0/apidocs/jakarta/ws/rs/HeaderParam.html). We adults are often pretty lazy, but to be honest, `req.getHeader` wouldn’t take that much longer to write. And as a bonus, your IDE will ensure nice API discoverability with autocompletion.
+
+<CapitalLetter letter={"I"}/> is for [`@Inject`](https://docs.oracle.com/javaee/7/api/javax/inject/Inject.html). Okay, maybe we’re going in circles here, but we’re not even halfway through the alphabet.
+
+<CapitalLetter letter={"J"}/> is for [`@JsonProperty`](https://fasterxml.github.io/jackson-annotations/javadoc/2.6/com/fasterxml/jackson/annotation/JsonProperty.html). Describing data schema together with the class fields is indeed convenient. But consider that the schema declared in this way will likely become your source of truth, in which case it’s going to be Java-centric. But if the schema is declared somewhere else, then it's likely that the annotated classes are going to be auto-generated, at which point, why not generate [more performant](https://github.com/fasterxml/jackson-docs/wiki/presentation:-jackson-performance#compatible-not-so-easy-use-the-streaming-api) code instead?
+
+<CapitalLetter letter={"K"}/> is for [`@KeyFor`](https://checkerframework.org/api/org/checkerframework/checker/nullness/qual/KeyFor.html). Even adults make mistakes, Jackie. So static analysis is here to help, and annotations are a decent tool to help you fix your mistakes early. Yet, at some point, the costs of maintaining those checks can outweigh the pros. If you have to rely on annotating keys for maps, consider if there is a way to rewrite the code with more rigid types.
+
+<CapitalLetter letter={"L"}/> is for [`@Log4j`](https://projectlombok.org/api/lombok/extern/log4j/Log4j). Believe me, Jackie, you don’t want to hear my opinion on using Lombok in the real world. Others have articulated well that it should be treated as a [separate language](https://www.reddit.com/r/java/comments/1dzw92m/why_theres_no_official_api_for_java_ast/lcl3v8e/), and I agree with them.
+
+<CapitalLetter letter={"M"}/> is for [`@Mock`](https://site.mockito.org/javadoc/current/org/mockito/Mock.html). Hey, Jackie, you’re young. You’ve got your whole life ahead of you. You don’t want to spend it updating the tests every time you change the structure of your code without changing its logic. Instead of mocks, prefer fakes, which let you [test state, not interactions](https://testing.googleblog.com/2013/03/testing-on-toilet-testing-state-vs.html). [`@DoNotMock`](https://errorprone.info/api/latest/com/google/errorprone/annotations/DoNotMock.html) is my favourite annotation these days.
+
+<CapitalLetter letter={"N"}/> is for [`@Nullable`](https://checkerframework.org/api/org/checkerframework/checker/nullness/qual/Nullable.html). Ah, the million-dollar friend: `NullPointerException`. Adding this metadata is great as long as it’s consistent, and potentially enforced with a tool like [NullAway](https://github.com/uber/NullAway). Otherwise, you won't be able to trust it.
+
+<CapitalLetter letter={"O"}/> is for [`@Override`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Override.html). Part metadata, part language feature mentioned in the [JLS](https://docs.oracle.com/javase/specs/jls/se21/html/jls-9.html#jls-9.6.4.4). If you’re using an IDE, you’ll never have to type it by hand.
+
+<CapitalLetter letter={"P"}/> is for [`@Profile`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/context/annotation/Profile.html). Because declarative Spring wiring wasn’t flexible enough, now we have declarative `if` conditions. At least the configuration is not stored in XML anymore.
+
+<CapitalLetter letter={"Q"}/> is for [`@Qualifier`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/beans/factory/annotation/Qualifier.html). What’s scary is that with this annotation, you can create your own custom qualifier annotation. I call it recursive magic.
+
+<CapitalLetter letter={"R"}/> is for [`@RestController`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/web/bind/annotation/RestController.html). A _@Component_ with a twist. I’m glad to see that more and more frameworks are moving to a [functional approach](https://docs.spring.io/spring-framework/reference/web/webflux-functional.html), which is a lot less magical, in a good way.
+
+<CapitalLetter letter={"S"}/> is for [`@SuppressWarnings`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/SuppressWarnings.html). Warnings quickly [start being meaningless](https://storage.googleapis.com/gweb-research2023-media/pubtools/4365.pdf) if you’re not failing the build on them, making this annotation a necessary evil.
+
+<CapitalLetter letter={"T"}/> is for [`@Transactional`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/transaction/annotation/Transactional.html). Many hours have been [wasted](https://stackoverflow.com/a/4396530/1542319) debugging `@Transactional` on private methods, Jackie.
+
+<CapitalLetter letter={"U"}/> is for [`@Untainted`](https://checkerframework.org/api/org/checkerframework/checker/tainting/qual/Untainted.html). [Taint checking](https://en.wikipedia.org/wiki/Taint_checking) is a very interesting concept. Some languages are built around it, like this project: [Jeeves](https://github.com/jeanqasaur/jeeves). But in Java, I honestly prefer the way Google does it by [using types](https://github.com/google/closure-templates/blob/8ac5cb53e79674bb66638f2d54c9442a2faa4d16/java/src/com/google/template/soy/data/SanitizedContent.java#L55-L59).
+
+<CapitalLetter letter={"V"}/> is for [`@VisibleForTesting`](https://guava.dev/releases/30.0-jre/api/docs/com/google/common/annotations/VisibleForTesting.html). On the surface, this annotation sounds useful: machine-readable metadata attached to a part of the program structure. But in reality, Jackie, it can encourage shortcuts by legitimising suboptimal choices. Avoid coupling your tests with the implementation details of your classes from the outside if you can.
+
+<CapitalLetter letter={"W"}/> is for [`@WebAppConfiguration`](https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/test/context/web/WebAppConfiguration.html). I think I used this one once. I don’t think I fully understood back then what it did. I wish I had just written plain old code instead.
+
+<CapitalLetter letter={"X"}/> is for [`@XmlElement`](https://jakarta.ee/specifications/xml-binding/2.3/apidocs/javax/xml/bind/annotation/xmlelement). We already discussed the issue of declaring a schema together with your code. Except these days, if you're parsing XML, it's more likely that you're reading a specific file format rather than integrating with another system.
+
+<CapitalLetter letter={"Y"}/> is for [`@YamlProperty`](https://github.com/beosign/snakeyaml-anno/blob/master/src/main/java/de/beosign/snakeyamlanno/property/YamlProperty.java). As before. Except, make sure to check out this masterpiece [noyaml.com](https://noyaml.com/) before committing to using this annotation.
+
+<CapitalLetter letter={"Z"}/> is for `@Z...`. You’ll have to write your own someday, Jackie. Maybe you’ll encounter a real problem where it’s genuinely useful to attach metadata to a part of your program structure – like marking unstable APIs with `@Beta` and enforcing rules about their usage programmatically. But don’t create a new annotation just to save yourself a few lines of code. Do it once to understand how magical frameworks work, and then never do it again. The magic shortcut is almost never worth it.
+
+### Instead of Conclusion
+
+Soon, Jackie, you’ll be growing up. Maybe your parents will even introduce you to some beautiful concepts like pure functions and immutable data. But then you’ll be searching the internet, and you might stumble upon some powerful concepts like metaprogramming and reflection. I hope that before using this power, you’ll remember the ABC of Java annotations – there is already one for every letter of the alphabet. Make sure to only use them consciously for good – attaching useful machine-readable metadata to your program structure instead of building magical frameworks.
+
+The internet is full of scary things, Jackie, but hopefully, this article prepares you for at least one of them. Now, go back to the Christmas table – we'll be watching [Simple Made Easy](https://www.youtube.com/watch?v=SxdOUGdseq4) instead of Die Hard this year.
