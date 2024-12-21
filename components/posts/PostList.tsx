@@ -3,6 +3,7 @@ import "@fontsource/alegreya"
 import PostLink from "./PostLink";
 import {Post} from "../../lib/posts";
 import Link from "next/link";
+import { JSX } from 'react/jsx-runtime';
 
 const PostList = ({posts, listClass, limit}: { posts: Post[], listClass: string, limit?: number }): JSX.Element => {
   const isLimited = posts.length > limit;

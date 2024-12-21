@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import "@fontsource/alegreya"
 import {Post} from "../../lib/posts";
 import Link from "next/link";

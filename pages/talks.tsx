@@ -4,6 +4,7 @@ import {GetStaticProps} from "next";
 import {getAllTalks, Talk} from "../lib/talks";
 import Link from "next/link";
 import {formatDate} from "../utils/dates";
+import { JSX } from 'react/jsx-runtime';
 
 export const Talks = ({talks}: { talks: Talk[]; }): JSX.Element => {
   return (

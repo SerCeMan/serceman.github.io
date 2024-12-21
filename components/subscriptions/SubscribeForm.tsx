@@ -25,7 +25,7 @@ export const SubscribeForm = () => {
       setEmail("")
       const json = await response.json()
       setStatus(json.status === "success" ? "SUCCESS" : "ERROR")
-    } catch (err) {
+    } catch {
       setStatus("ERROR")
     }
   }

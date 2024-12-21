@@ -15,7 +15,7 @@ import remarkGfm from 'remark-gfm';
 import Layout from '../../components/Layout';
 import {MetaProps} from '../../types/layout';
 import {POSTS_PATH, postUrlPaths} from '../../utils/mdxUtils';
-import React from "react";
+import React, { JSX } from "react";
 import "@fontsource/noto-serif";
 import rehypeHighlight from "rehype-highlight";
 import clojure from 'highlight.js/lib/languages/clojure'

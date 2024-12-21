@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {JSX, useEffect} from 'react';
 
 export const TweetEmbed = ({children}: {children: React.ReactNode}): JSX.Element => {
   useEffect(() => {

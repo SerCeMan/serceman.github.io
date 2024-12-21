@@ -1,4 +1,5 @@
 import React from 'react';
+import { JSX } from 'react/jsx-runtime';
 
 const TimeQuizChooser = ({id}: {id: string}): JSX.Element => {
   return (
