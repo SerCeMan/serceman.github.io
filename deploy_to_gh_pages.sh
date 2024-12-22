@@ -14,7 +14,6 @@ main() {
     error "there are uncommitted changes"
   fi
   yarn build
-  yarn export
 
   local temp_dir
   temp_dir=$(mktemp -d -t nextjsdeployment)
