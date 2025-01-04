@@ -18,3 +18,5 @@ yarn-error.log*
 # escape it, or learn to live with it.
 /public/feed.xml
 /public/sitemap.xml
+# next-on-pages output directory
+.vercel
